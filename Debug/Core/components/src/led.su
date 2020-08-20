@@ -1,0 +1,2 @@
+led.c:14:6:led_update	8	static
+led.c:20:6:led_set	0	static

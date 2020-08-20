@@ -1,0 +1,5 @@
+dataProcessing.c:13:6:calibrate_mag_reading	40	static
+dataProcessing.c:26:6:calc_absolute_acceleration	136	static
+dataProcessing.c:48:6:normalize	40	static
+dataProcessing.c:55:6:calc_magnetic_orientation	104	static
+dataProcessing.c:158:6:build_data_str	56	static

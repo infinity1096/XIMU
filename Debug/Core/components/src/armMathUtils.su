@@ -1,0 +1,4 @@
+armMathUtils.c:14:6:zeros	0	static
+armMathUtils.c:18:6:eye	8	static
+armMathUtils.c:31:6:matcpy	4	static
+armMathUtils.c:44:6:matcpy2	24	static

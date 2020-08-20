@@ -1,0 +1,15 @@
+ms5611.c:29:6:ms5611_set_i2c	0	static
+ms5611.c:40:9:ms5611_read_i2c	16	static
+ms5611.c:51:9:ms5611_write_i2c	16	static
+ms5611.c:58:6:ms5611_osr_select	0	static
+ms5611.c:67:6:ms5611_init	40	static
+ms5611.c:83:6:ms5611_request_pressure	24	static
+ms5611.c:91:6:ms5611_retrieve_pressure	24	static
+ms5611.c:106:6:ms5611_request_temperature	24	static
+ms5611.c:114:6:ms5611_retrieve_temperature	24	static
+ms5611.c:128:6:ms5611_update_pressure	32	static
+ms5611.c:139:6:ms5611_update_temperature	32	static
+ms5611.c:150:6:ms5611_update	40	static
+ms5611.c:188:8:ms5611_get_temperature	32	static
+ms5611.c:206:8:ms5611_get_pressure	56	static
+ms5611.c:163:6:ms5611_timer_update	56	static
