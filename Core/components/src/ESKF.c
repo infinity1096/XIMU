@@ -45,21 +45,25 @@ void ESKF_new(ESKF_filter* eskf){
 	arm_mat_init_f32(&eskf->I3,3,3,eskf->I3_data);
 	arm_mat_init_f32(&eskf->I12,12,12,eskf->I12_data);
 	arm_mat_init_f32(&eskf->I15,15,15,eskf->I15_data);
+	arm_mat_init_f32(&eskf->g,3,1,eskf->g_data);
 
 	eye(&eskf->I3);
 	eye(&eskf->I12);
 	eye(&eskf->I15);
+	zeros(&eskf->g);	eskf->g_data[2] = -9.81;
 
 	//Nominal states
 	arm_mat_init_f32(&eskf->p,3,1,eskf->p_data);
 	arm_mat_init_f32(&eskf->v,3,1,eskf->v_data);
 	arm_mat_init_f32(&eskf->q,4,1,eskf->q_data);
+	arm_mat_init_f32(&eskf->R,4,1,eskf->R_data);
 	arm_mat_init_f32(&eskf->ab,3,1,eskf->ab_data);
 	arm_mat_init_f32(&eskf->wb,3,1,eskf->wb_data);
 
 	zeros(&eskf->p);
 	zeros(&eskf->v);
 	zeros(&eskf->q);eskf->q.pData[0] = 1.0;//q = [1,0,0,0]'
+	eye(&eskf->R);
 	zeros(&eskf->ab);
 	zeros(&eskf->wb);
 
@@ -148,6 +152,10 @@ void ESKF_new(ESKF_filter* eskf){
 
 	//time
 	eskf->last_t = -1;
+
+	//AUX variables necessary during computation
+	arm_mat_init_f32(&eskf->am_unbias,3,1,eskf->am_unbias_data);
+	arm_mat_init_f32(&eskf->wm_unbias,3,1,eskf->wm_unbias_data);
 }
 
 /**
@@ -209,6 +217,73 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 
 		eskf->last_t = t;
 	}
+
+	//[IMU Information arrived]
+	if (info == 1){
+		double dt = t - eskf->last_t;
+		double dt_2 = dt * dt;
+		eskf->last_t = t;
+
+		arm_matrix_instance_f32 tempvec;
+		float32_t tempvec_data[3*1];
+		arm_mat_init_f32(tempvec,3,1,tempvec_data);
+
+		quat2mat(&eskf->q,&eskf->R);//Get equivlent representation of orientation
+
+		arm_mat_sub_f32(&eskf->am,&eskf->ab,&eskf->am_unbias);//subtract bias
+
+		//Update nominal states -----------------------------------------------
+
+		/* MATLAB code
+		p = p + v * dt + 1/2*(R*(am - ab) + g) * dt_2;
+        v = v + (R*(am - ab) + g) * dt;
+        q = otimes(q,quatexp2((wm-wb)*dt));
+        %ab = ab;
+        %wb = wb;
+		*/
+
+		//update p
+		arm_mat_scale_f32(&eskf->v,dt,&tempvec);
+		arm_mat_add_f32(&eskf->p,&tempvec,&eskf->p);
+		arm_mat_mult_f32(&eskf->R,&eskf->am_unbias,&tempvec);
+		arm_mat_add_f32(&tempvec,&eskf->g,&tempvec);
+		arm_mat_scale_f32(&tempvec,0.5*dt_2,&tempvec);
+		arm_mat_add_f32(&eskf->p,&tempvec,&eskf->p);
+
+		//update v
+		arm_mat_mult_f32(&eskf->R,&eskf->am_unbias,&tempvec);
+		arm_mat_add_f32(&tempvec,&eskf->g,&tempvec);
+		arm_mat_scale_f32(&tempvec,dt,&tempvec);
+		arm_mat_add_f32(&eskf->v,&tempvec,&eskf->v);
+
+		//update q TODO
+
+		//eskf->ab (unchanged)
+		//eskf->wb (unchanged)
+
+		//Update error states -----------------------------------------------
+		quat2mat(&eskf->q,&eskf->R);//Update R to our best estimation
+
+		//Since we haven't observed the error state(It's reset after every observation),and
+		//its mean is 0. Therefore our best estimate of the error state is 0. Then its mean
+		//does not need to be updated. However, its uncertainty needs to be updated.
+
+		/* MATLAB code
+		Fx = eye(15);
+        Fx(1:3,4:6) = eye(3) * dt;
+        Fx(4:6,7:9) = -R * hat(am-ab)*dt;
+        Fx(4:6,10:12) = -R*dt;
+        Fx(7:9,7:9) = matexp2((wm-wb)*dt)';
+        Fx(7:9,13:15) = -eye(3)*dt;
+		 */
+
+		eye(&eskf->Fx);
+
+	}
+
+
+
+
 
 
 }

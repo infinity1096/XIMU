@@ -39,6 +39,9 @@ typedef struct{
 	arm_matrix_instance_f32 q;
 	float32_t q_data[4*1];
 
+	arm_matrix_instance_f32 R;
+	float32_t R_data[3*3];
+
 	arm_matrix_instance_f32 ab;
 	float32_t ab_data[3*1];
 
@@ -118,6 +121,9 @@ typedef struct{
 	arm_matrix_instance_f32 I15;
 	float32_t I15_data[15*15];
 
+	arm_matrix_instance_f32 g;
+	float32_t g_data[3*1];
+
 
 	//Initialization variables
 	int IMU_init_count;
@@ -132,7 +138,15 @@ typedef struct{
 
 	float32_t lla_init[3];
 
+	//Time
 	double last_t;
+
+	//AUX variables necessary during computation
+	arm_matrix_instance_f32 am_unbias;
+	float32_t am_unbias_data[3*1];
+
+	arm_matrix_instance_f32 wm_unbias;
+	float32_t wm_unbias_data[3*1];
 
 }ESKF_filter;
 
