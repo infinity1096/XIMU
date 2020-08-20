@@ -2,3 +2,6 @@ armMathUtils.c:14:6:zeros	0	static
 armMathUtils.c:18:6:eye	8	static
 armMathUtils.c:31:6:matcpy	4	static
 armMathUtils.c:44:6:matcpy2	24	static
+armMathUtils.c:55:6:hat	8	static
+armMathUtils.c:70:6:vee	16	static
+armMathUtils.c:82:6:matexp2	112	static

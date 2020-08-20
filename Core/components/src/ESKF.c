@@ -156,6 +156,11 @@ void ESKF_new(ESKF_filter* eskf){
 	//AUX variables necessary during computation
 	arm_mat_init_f32(&eskf->am_unbias,3,1,eskf->am_unbias_data);
 	arm_mat_init_f32(&eskf->wm_unbias,3,1,eskf->wm_unbias_data);
+
+	arm_mat_init_f32(&eskf->R_hat_am_unbias,3,3,eskf->R_hat_am_unbias_data);
+	arm_mat_init_f32(&eskf->matexp2_wub_dt,3,3,eskf->matexp2_wub_dt_data);
+
+
 }
 
 /**
@@ -226,7 +231,11 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 
 		arm_matrix_instance_f32 tempvec;
 		float32_t tempvec_data[3*1];
-		arm_mat_init_f32(tempvec,3,1,tempvec_data);
+		arm_mat_init_f32(&tempvec,3,1,tempvec_data);
+		arm_matrix_instance_f32 tempmat;
+		float32_t tempmat_data[3*3];
+		arm_mat_init_f32(&tempmat,3,3,tempmat_data);
+
 
 		quat2mat(&eskf->q,&eskf->R);//Get equivlent representation of orientation
 
@@ -258,8 +267,8 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 
 		//update q TODO
 
-		//eskf->ab (unchanged)
-		//eskf->wb (unchanged)
+		//update ab (unchanged)
+		//update wb (unchanged)
 
 		//Update error states -----------------------------------------------
 		quat2mat(&eskf->q,&eskf->R);//Update R to our best estimation
@@ -273,15 +282,46 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
         Fx(1:3,4:6) = eye(3) * dt;
         Fx(4:6,7:9) = -R * hat(am-ab)*dt;
         Fx(4:6,10:12) = -R*dt;
-        Fx(7:9,7:9) = matexp2((wm-wb)*dt)';
+        Fx(7:9,7:9) = matexp2((wm-wb)*dt)'; <- Note this transpose!
         Fx(7:9,13:15) = -eye(3)*dt;
 		 */
 
+		//fill Fx
 		eye(&eskf->Fx);
+		//
+		matcpy2(&eskf->Fx,&eskf->I3,0,3);
+		//
+		hat(&eskf->am_unbias,&tempmat);
+		arm_mat_mult_f32(&eskf->R,&tempmat,&eskf->R_hat_am_unbias);
+		arm_mat_scale_f32(&eskf->R_hat_am_unbias,-dt,&eskf->R_hat_am_unbias);
+		matcpy2(&eskf->Fx,&eskf->R_hat_am_unbias,3,6);
+		//
+		arm_mat_scale_f32(&eskf->R,-dt,&tempmat);
+		matcpy2(&eskf->Fx,&tempmat,3,9);
+		//
+		arm_mat_scale_f32(&eskf->wm_unbias,-dt,&tempvec);//changed dt to -dt is equivalent to transpose
+		matexp2(&tempvec,&tempmat);
+		matcpy2(&eskf->Fx,&tempmat,6,6);
+		//
+		arm_mat_scale_f32(&eskf->I3,-dt,&tempmat);
+		matcpy2(&eskf->Fx,&tempmat,6,12);
+
+		//fill Fi : Fi does not change. Already done in "ESKF_new".
+
+		//fill Q according to predefined an, wn, abn, wbn.
+
 
 	}
 
+	//[MAG Information arrived]
+	if (info == 2){
 
+	}
+
+	//[GPS Information arrived]
+	if (info == 3){
+
+	}
 
 
 

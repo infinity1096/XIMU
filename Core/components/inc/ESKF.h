@@ -141,12 +141,19 @@ typedef struct{
 	//Time
 	double last_t;
 
-	//AUX variables necessary during computation
+	//temp variables necessary during computation
 	arm_matrix_instance_f32 am_unbias;
 	float32_t am_unbias_data[3*1];
 
 	arm_matrix_instance_f32 wm_unbias;
 	float32_t wm_unbias_data[3*1];
+
+	arm_matrix_instance_f32 R_hat_am_unbias;// R * hat(am - ab) = R * hat(am_unbias)
+	float32_t R_hat_am_unbias_data[3*3];
+
+	arm_matrix_instance_f32 matexp2_wub_dt;
+	float32_t matexp2_wub_dt_data[3*3];
+
 
 }ESKF_filter;
 

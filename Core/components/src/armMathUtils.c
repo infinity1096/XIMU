@@ -52,9 +52,61 @@ void matcpy2(arm_matrix_instance_f32* mat1,arm_matrix_instance_f32* mat2,int i, 
 	}
 }
 
-//3D rotation functions
+void hat(arm_matrix_instance_f32* v_, arm_matrix_instance_f32* v_hat_){
+
+	float32_t* v = v_->pData;
+	float32_t* v_hat = v_hat_->pData;
+
+	zeros(v_hat_);
+
+	v_hat[1] = -v[2];
+	v_hat[2] = v[1];
+	v_hat[3] = v[2];
+	v_hat[5] = -v[0];
+	v_hat[6] = -v[1];
+	v_hat[7] = v[0];
+}
+
+void vee(arm_matrix_instance_f32* v_hat_, arm_matrix_instance_f32* v_){
+
+	float32_t* v = v_->pData;
+	float32_t* v_hat = v_hat_->pData;
+
+	v[0] = v_hat[7] - v_hat[5];
+	v[1] = v_hat[2] - v_hat[6];
+	v[2] = v_hat[3] - v_hat[1];
+
+	arm_mat_scale_f32(v_,0.5,v_);
+}
+
+void matexp2(arm_matrix_instance_f32* phi_, arm_matrix_instance_f32* R_){
+
+	float32_t* phi = phi_->pData;
+	float32_t phi_norm = sqrt(phi[0]*phi[0] + phi[1]*phi[1] + phi[2]*phi[2]);
+
+	arm_matrix_instance_f32 tempmat;
+	float32_t tempmat_data[3*3];
+	arm_matrix_instance_f32 u_hat;
+	float32_t u_hat_data[3*3];
 
 
+	arm_mat_init_f32(&tempmat,3,3,tempmat_data);
+	arm_mat_init_f32(&u_hat,3,3,u_hat_data);
+
+	//MATLAB code
+	//mat = eye(3) + sin(phi) * phi_hat + (1 - cos(phi)) * (phi_hat^2);
+
+	eye(R_);
+
+	hat(phi_,&u_hat);
+	arm_mat_scale_f32(&u_hat, 1/phi_norm, &u_hat);
+	arm_mat_scale_f32(&u_hat,sin(phi_norm),&tempmat);
+	arm_mat_add_f32(R_,&tempmat,R_);
+
+	arm_mat_mult_f32(&u_hat,&u_hat,&tempmat);
+	arm_mat_scale_f32(&tempmat,1-cos(phi_norm),&tempmat);
+	arm_mat_add_f32(R_,&tempmat,R_);
+}
 
 
 

@@ -92,6 +92,14 @@ void otimes(arm_matrix_instance_f32* q1,arm_matrix_instance_f32* q2,arm_matrix_i
 	arm_mat_mult_f32(&qL,q2,q_res);
 }
 
+/**
+ * quaternion exponential
+ */
+void quatexp2(arm_matrix_instance_f32* phi_, arm_matrix_instance_f32* q_){
+	//TODO TODO
+}
+
+
 
 /**
  * Jacobian w.r.t. rotation. Define vector v' as the result of rotating vector v by quaternion

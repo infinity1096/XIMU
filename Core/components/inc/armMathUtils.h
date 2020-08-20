@@ -14,7 +14,8 @@ void zeros(arm_matrix_instance_f32* mat);
 void eye(arm_matrix_instance_f32* mat);
 void matcpy(arm_matrix_instance_f32* mat1,arm_matrix_instance_f32* mat2);
 void matcpy2(arm_matrix_instance_f32* mat1,arm_matrix_instance_f32* mat2,int i, int j);
-
-
+void hat(arm_matrix_instance_f32* v_, arm_matrix_instance_f32* v_hat_);
+void vee(arm_matrix_instance_f32* v_hat_, arm_matrix_instance_f32* v_);
+void matexp2(arm_matrix_instance_f32* phi_, arm_matrix_instance_f32* R_);
 
 #endif /* COMPONENTS_ARMMATHUTILS_H_ */

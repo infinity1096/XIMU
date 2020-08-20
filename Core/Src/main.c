@@ -188,10 +188,15 @@ int main(void)
 	  float32_t q_res_data[4*1] = {0};
 
 	  arm_matrix_instance_f32 v;
-	  float32_t v_data[3*1] = {1,2,3};
+	  float32_t v_data[3*1] = {0.1,0.2,0.3};
 
 	  arm_matrix_instance_f32 jacob;
 	  float32_t jacob_data[3*4] = {0};
+
+	  arm_matrix_instance_f32 R;
+	  float32_t R_data[3*3] = {1,2,3,4,5,6,7,8,9};
+
+
 
 	  arm_mat_init_f32(&q1,4,1,q1_data);
 	  arm_mat_init_f32(&q2,4,1,q2_data);
@@ -199,6 +204,10 @@ int main(void)
 
 	  arm_mat_init_f32(&v,3,1,v_data);
 	  arm_mat_init_f32(&jacob,4,3,jacob_data);
+	  arm_mat_init_f32(&R,3,3,R_data);
+
+
+
 
 
 	  q1.pData[0] = 1.2;
@@ -213,9 +222,12 @@ int main(void)
 
 	  __NOP();
 
-	  otimes(&q1,&q2,&q_res);
 
-	  diff_q_diff_dtheta(&q1,&jacob);
+
+	  __NOP();
+
+
+
 
 	  int i = 0;
 
