@@ -99,13 +99,19 @@ void matexp2(arm_matrix_instance_f32* phi_, arm_matrix_instance_f32* R_){
 	eye(R_);
 
 	hat(phi_,&u_hat);
-	arm_mat_scale_f32(&u_hat, 1/phi_norm, &u_hat);
-	arm_mat_scale_f32(&u_hat,sin(phi_norm),&tempmat);
-	arm_mat_add_f32(R_,&tempmat,R_);
 
-	arm_mat_mult_f32(&u_hat,&u_hat,&tempmat);
-	arm_mat_scale_f32(&tempmat,1-cos(phi_norm),&tempmat);
-	arm_mat_add_f32(R_,&tempmat,R_);
+	if (fabs(phi_norm >= 1e-6)){
+		arm_mat_scale_f32(&u_hat, 1/phi_norm, &u_hat);
+		arm_mat_scale_f32(&u_hat,sin(phi_norm),&tempmat);
+		arm_mat_add_f32(R_,&tempmat,R_);
+
+		arm_mat_mult_f32(&u_hat,&u_hat,&tempmat);
+		arm_mat_scale_f32(&tempmat,1-cos(phi_norm),&tempmat);
+		arm_mat_add_f32(R_,&tempmat,R_);
+	}else{
+		//approximation: mat = eye(3) + phi^
+		arm_mat_add_f32(R_,&u_hat,R_);
+	}
 }
 
 

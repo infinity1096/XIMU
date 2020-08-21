@@ -31,19 +31,16 @@
 
 #define GPS_INITIALIZE_COUNT 10		//number of GPS samples collected to initialize local lat/lon origin
 
-#define A_NOISE 1e-2
-#define W_NOISE 1e-4
-#define AB_NOISE 1e-6
-#define WB_NOISE 1e-8
+#define A_NOISE 5e-2
+#define W_NOISE 5e-4
+#define AB_NOISE 0.0001
+#define WB_NOISE 0.0001
 
 void ESKF_new(ESKF_filter* eskf){
 
 	eskf->IMU_initialized = 0;
 	eskf->MAG_initialized = 0;
 	eskf->GPS_initialized = 0;
-
-	//for simplicity
-	float32_t* P = eskf->P.pData;
 
 	//Utils
 	arm_mat_init_f32(&eskf->I3,3,3,eskf->I3_data);
@@ -60,7 +57,7 @@ void ESKF_new(ESKF_filter* eskf){
 	arm_mat_init_f32(&eskf->p,3,1,eskf->p_data);
 	arm_mat_init_f32(&eskf->v,3,1,eskf->v_data);
 	arm_mat_init_f32(&eskf->q,4,1,eskf->q_data);
-	arm_mat_init_f32(&eskf->R,4,1,eskf->R_data);
+	arm_mat_init_f32(&eskf->R,3,3,eskf->R_data);
 	arm_mat_init_f32(&eskf->ab,3,1,eskf->ab_data);
 	arm_mat_init_f32(&eskf->wb,3,1,eskf->wb_data);
 
@@ -87,6 +84,9 @@ void ESKF_new(ESKF_filter* eskf){
 	//covariance matrix
 	arm_mat_init_f32(&eskf->P,15,15,eskf->P_data);
 	arm_mat_init_f32(&eskf->Q,12,12,eskf->Q_data);
+
+	//for simplicity
+	float32_t* P = eskf->P.pData;
 
 	zeros(&eskf->P);
 
@@ -150,12 +150,14 @@ void ESKF_new(ESKF_filter* eskf){
 
 	arm_mat_init_f32(&eskf->am_init,3,1,eskf->am_init_data);
 	arm_mat_init_f32(&eskf->mm_init,3,1,eskf->mm_init_data);
+	arm_mat_init_f32(&eskf->m_ref,3,1,eskf->m_ref_data);
 
 	zeros(&eskf->am_init);
 	zeros(&eskf->mm_init);
+	zeros(&eskf->m_ref);
 
 	//time
-	eskf->last_t = -1;
+	eskf->last_t = 0;
 
 	//AUX variables necessary during computation
 	arm_mat_init_f32(&eskf->am_unbias,3,1,eskf->am_unbias_data);
@@ -181,7 +183,7 @@ void ESKF_new(ESKF_filter* eskf){
  * info - indicates which type of information is passed to this function.
  * 		- 1 = IMU, 2 = MAG, 3 = GPS
  */
-void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double mm[3], double lla[3], int info){
+void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], float32_t mm[3], float32_t lla[3], int info){
 
 	//for simplicity
 	float32_t* Q = eskf->Q.pData;
@@ -209,7 +211,7 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 			}
 
 			if (eskf->IMU_init_count == IMU_INITIALIZE_COUNT){
-				arm_mat_scale_f32(&eskf->am_init,1/IMU_INITIALIZE_COUNT,&eskf->am_init);
+				arm_mat_scale_f32(&eskf->am_init,1.0/IMU_INITIALIZE_COUNT,&eskf->am_init);
 
 				//calculate initial orientation
 
@@ -227,13 +229,22 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 		}
 
 		if (info == 3 && eskf->GPS_initialized == 0){
+			eskf->lla_init[0] += lla[0];
+			eskf->lla_init[1] += lla[1];
+			eskf->lla_init[2] += lla[2];
 
+			eskf->GPS_init_count++;
+			if (eskf->GPS_init_count == GPS_INITIALIZE_COUNT){
+				eskf->lla_origin[0] = eskf->lla_init[0] / GPS_INITIALIZE_COUNT;
+				eskf->lla_origin[1] = eskf->lla_init[1] / GPS_INITIALIZE_COUNT;
+				eskf->lla_origin[2] = eskf->lla_init[2] / GPS_INITIALIZE_COUNT;
 
-
-
+				eskf->GPS_initialized = 1;
+			}
 		}
 
-		eskf->last_t = t;
+		//eskf->last_t = t; TODO only for testing
+		//return; TODO only for testing
 	}
 
 	//[IMU Information arrived]
@@ -255,7 +266,8 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 
 		quat2mat(&eskf->q,&eskf->R);//Get equivlent representation of orientation
 
-		arm_mat_sub_f32(&eskf->am,&eskf->ab,&eskf->am_unbias);//subtract bias
+		arm_mat_sub_f32(&eskf->am,&eskf->ab,&eskf->am_unbias);//subtract acc  bias
+		arm_mat_sub_f32(&eskf->wm,&eskf->wb,&eskf->wm_unbias);//subtract gyro bias
 
 		//Update nominal states -----------------------------------------------
 
@@ -309,7 +321,8 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 		//fill Fx
 		eye(&eskf->Fx);
 		//
-		matcpy2(&eskf->Fx,&eskf->I3,0,3);
+		arm_mat_scale_f32(&eskf->I3,dt,&tempmat);
+		matcpy2(&eskf->Fx,&tempmat,0,3);
 		//
 		hat(&eskf->am_unbias,&tempmat);
 		arm_mat_mult_f32(&eskf->R,&tempmat,&eskf->R_hat_am_unbias);
@@ -320,7 +333,7 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 		matcpy2(&eskf->Fx,&tempmat,3,9);
 		//
 		arm_mat_scale_f32(&eskf->wm_unbias,-dt,&tempvec);//changed dt to -dt is equivalent to transpose
-		matexp2(&tempvec,&tempmat);
+		matexp2(&tempvec,&tempmat);//TODO gives nan data
 		matcpy2(&eskf->Fx,&tempmat,6,6);
 		//
 		arm_mat_scale_f32(&eskf->I3,-dt,&tempmat);
@@ -329,17 +342,18 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 		//fill Fi : Fi does not change. Already done in "ESKF_new".
 
 		//fill Q according to predefined an, wn, abn, wbn and dt.
-		Q[0] = Q[13] = Q[26] = A_NOISE * dt_2;
-		Q[39] = Q[52] = Q[65] = W_NOISE * dt_2;
-		Q[78] = Q[91] = Q[104] = AB_NOISE * dt;
-		Q[117] = Q[130] = Q[143] = WB_NOISE * dt;
+		Q[0] = Q[13] = Q[26] = 1.0e-4;
+		Q[39] = Q[52] = Q[65] = 1.0e-6;
+		Q[78] = Q[91] = Q[104] = 1e-6;//Due to computation precision, can't use dt here
+		Q[117] = Q[130] = Q[143] = 1e-6;
 
-		//update P: P = Fx * P * Fx' + Fi * Q_t * Fi';
+		//update P: P = Fx * P * Fx' + Fi * Q * Fi';
 		arm_mat_trans_f32(&eskf->Fx,&eskf->Fx_T);
 		arm_mat_mult_f32(&eskf->Fx,&eskf->P,&eskf->Fx_P);
 		arm_mat_mult_f32(&eskf->Fx_P,&eskf->Fx_T,&eskf->P_temp);
 		matcpy(&eskf->P_temp,&eskf->P);
 		arm_mat_mult_f32(&eskf->Fi,&eskf->Q,&eskf->Fi_Q);
+		arm_mat_trans_f32(&eskf->Fi,&eskf->Fi_T);
 		arm_mat_mult_f32(&eskf->Fi_Q,&eskf->Fi_T,&eskf->P_temp);
 		arm_mat_add_f32(&eskf->P,&eskf->P_temp,&eskf->P);
 	}
@@ -353,12 +367,61 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 	if (info == 3){
 
 	}
-
-
-
-
 }
 
+/**
+ * convert lla - latitude, longitude, altitude in WGS84 coordinate
+ * into ENU - East, North, Up coordinate centered at lla_ref
+ *
+ * More details can be found here:
+ * http://www.wiki.gis.com/wiki/index.php/Geodetic_system
+ */
+void lla2enu(float32_t lla_ref[3], float32_t lla[3], float32_t enu[3]){
+
+	float32_t xyz_ref[3], xyz[3];
+	lla2xyz(lla_ref,xyz_ref);
+	lla2xyz(lla,xyz);
+
+	float32_t lat_ref = lla_ref[0] / 180.0 * M_PI;
+	float32_t lon_ref = lla_ref[1] / 180.0 * M_PI;
+
+	float32_t sin_lat_ref = sin(lat_ref);
+	float32_t cos_lat_ref = cos(lat_ref);
+	float32_t sin_lon_ref = sin(lon_ref);
+	float32_t cos_lon_ref = cos(lon_ref);
+
+	float32_t dx = xyz[0] - xyz_ref[0];
+	float32_t dy = xyz[1] - xyz_ref[1];
+	float32_t dz = xyz[2] - xyz_ref[2];
+
+	enu[0] = -sin_lon_ref * dx + cos_lon_ref * dy;
+	enu[1] = -sin_lat_ref*cos_lon_ref*dx - sin_lat_ref*sin_lon_ref*dy + cos_lat_ref * dz;
+	enu[2] = cos_lat_ref*cos_lon_ref*dx + cos_lat_ref*sin_lon_ref*dy + sin_lat_ref * dz;
+}
+
+/**
+ * convert lla to ECEF xyz coordinate
+ */
+void lla2xyz(float32_t lla[3], float32_t xyz[3]){
+
+	float32_t lat = lla[0] / 180.0 * M_PI;//DEG -> RAD
+	float32_t lon = lla[1] / 180.0 * M_PI;
+
+	float32_t a = 6378137.0;//earth semimajor axis in meters
+	//float32_t f = 0.003352810664747;//reciprocal flattening
+	float32_t e2 = 0.006694379990141;//eccentricity squared, e2 = 2*f - f^2
+
+	float32_t sin_lat = sin(lat);
+	float32_t cos_lat = cos(lat);
+	float32_t sin_lon = sin(lon);
+	float32_t cos_lon = cos(lon);
+
+	float32_t chi = sqrt(1-e2 * sin_lat * sin_lat);
+
+	xyz[0] = (a / chi + lla[2]) * cos_lat * cos_lon;
+	xyz[1] = (a / chi + lla[2]) * cos_lat * sin_lon;
+	xyz[2] = (a * (1-e2) / chi + lla[2]) * sin_lat;
+}
 
 
 

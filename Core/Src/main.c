@@ -176,10 +176,15 @@ int main(void)
   //TEST MEMORY
   ESKF_filter eskf;
   ESKF_new(&eskf);
-  ESKF_update(&eskf,0,(double*)0,(double*)0,(double*)0,(double*)0,1);
+  //ESKF_update(&eskf,0,(double*)0,(double*)0,(double*)0,(double*)0,1);
 
 
+  float32_t am[3] = {0,0,-9.81};
+  float32_t wm[3] = {0,0,0};
+  float32_t mm[3] = {0,1,0};
+  float32_t lla[3] = {1,2,3};
 
+  ESKF_update(&eskf,0.01,am,wm,mm,lla,1);
 
   /* USER CODE END 2 */
 
@@ -191,53 +196,13 @@ int main(void)
   while (1){
 	  led_set(LED_MEASURING);
 
-	  arm_matrix_instance_f32 q1;
-	  float32_t q1_data[4*1] = {0};
+	  float32_t lla_ref[3] = {10,10,100};
+	  float32_t lla[3] = {11,12,200};
+	  float32_t enu[3] = {0,0,0};
 
-	  arm_matrix_instance_f32 q2;
-	  float32_t q2_data[4*1] = {0};
-
-	  arm_matrix_instance_f32 q_res;
-	  float32_t q_res_data[4*1] = {0};
-
-	  arm_matrix_instance_f32 v;
-	  float32_t v_data[3*1] = {0.1,0.2,0.3};
-
-	  arm_matrix_instance_f32 jacob;
-	  float32_t jacob_data[3*4] = {0};
-
-	  arm_matrix_instance_f32 R;
-	  float32_t R_data[3*3] = {1,2,3,4,5,6,7,8,9};
+	  lla2enu(lla,lla_ref,enu);
 
 
-
-	  arm_mat_init_f32(&q1,4,1,q1_data);
-	  arm_mat_init_f32(&q2,4,1,q2_data);
-	  arm_mat_init_f32(&q_res,4,1,q_res_data);
-
-	  arm_mat_init_f32(&v,3,1,v_data);
-	  arm_mat_init_f32(&jacob,4,3,jacob_data);
-	  arm_mat_init_f32(&R,3,3,R_data);
-
-
-
-
-
-	  q1.pData[0] = 1.2;
-	  q1.pData[1] = 2.1;
-	  q1.pData[2] = 3.23;
-	  q1.pData[3] = 5.04;
-
-	  q2.pData[0] = -0.3;
-	  q2.pData[1] = 0.978;
-	  q2.pData[2] = 0.12;
-	  q2.pData[3] = 3.22;
-
-	  __NOP();
-
-	  quatexp2(&v,&q1);
-
-	  __NOP();
 
 
 

@@ -1,2 +1,4 @@
-ESKF.c:39:6:ESKF_new	56	static
-ESKF.c:184:6:ESKF_update	160	static
+ESKF.c:39:6:ESKF_new	48	static
+ESKF.c:186:6:ESKF_update	152	static
+ESKF.c:405:6:lla2xyz	56	static
+ESKF.c:379:6:lla2enu	72	static

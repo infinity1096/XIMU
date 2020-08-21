@@ -138,6 +138,11 @@ typedef struct{
 	float32_t mm_init_data[3*1];
 
 	float32_t lla_init[3];
+	float32_t lla_origin[3];
+
+	arm_matrix_instance_f32 m_ref;//magnetic field reference
+	float32_t m_ref_data[3*1];
+
 
 	//Time
 	double last_t;
@@ -172,5 +177,12 @@ typedef struct{
 
 
 }ESKF_filter;
+
+void ESKF_new(ESKF_filter* eskf);
+void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], float32_t mm[3], float32_t lla[3], int info);
+
+void lla2enu(float32_t lla_ref[3], float32_t lla[3], float32_t enu[3]);
+void lla2xyz(float32_t lla[3], float32_t xyz[3]);
+
 
 #endif /* COMPONENTS_INC_ESKF_H_ */
