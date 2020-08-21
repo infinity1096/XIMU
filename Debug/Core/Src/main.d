@@ -40,7 +40,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/XIMU_conf.h ../Core/Inc/arm_math.h \
  ../Drivers/CMSIS/Include/cmsis_compiler.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/armMathUtils.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/quaternion.h
+ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/quaternion.h \
+ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ESKF.h
 
 ../Core/Inc/main.h:
 
@@ -129,3 +130,5 @@ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/dataProcess
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/armMathUtils.h:
 
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/quaternion.h:
+
+C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ESKF.h:

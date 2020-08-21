@@ -96,7 +96,21 @@ void otimes(arm_matrix_instance_f32* q1,arm_matrix_instance_f32* q2,arm_matrix_i
  * quaternion exponential
  */
 void quatexp2(arm_matrix_instance_f32* phi_, arm_matrix_instance_f32* q_){
-	//TODO TODO
+
+	float32_t* q = q_->pData;
+	float32_t* phi = phi_->pData;
+
+	float32_t theta = 0.5 * sqrt(phi[0]*phi[0] + phi[1]*phi[1] + phi[2]*phi[2]);
+
+	if (fabs(theta) <= 1e-6){
+		q[0] = 1;	q[1] = 0;	q[2] = 0;	q[3] = 0;
+		return;
+	}
+
+	q[0] = cos(theta);
+	q[1] = sin(theta) * 0.5 * phi[0] / theta;
+	q[2] = sin(theta) * 0.5 * phi[1] / theta;
+	q[3] = sin(theta) * 0.5 * phi[2] / theta;
 }
 
 

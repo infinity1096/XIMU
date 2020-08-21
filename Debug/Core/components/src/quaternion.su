@@ -2,6 +2,7 @@ quaternion.c:14:6:quat2mat	56	static
 quaternion.c:49:6:quat_L	0	static
 quaternion.c:67:6:quat_R	0	static
 quaternion.c:86:6:otimes	88	static
-quaternion.c:100:6:diff_qvq_diff_a	56	static
-quaternion.c:104:6:diff_qvq_diff_q	24	static
-quaternion.c:131:6:diff_q_diff_dtheta	8	static
+quaternion.c:98:6:quatexp2	32	static
+quaternion.c:122:6:diff_qvq_diff_a	56	static
+quaternion.c:126:6:diff_qvq_diff_q	24	static
+quaternion.c:153:6:diff_q_diff_dtheta	8	static

@@ -41,6 +41,7 @@
 #include "arm_math.h"
 #include "armMathUtils.h"
 #include "quaternion.h"
+#include "ESKF.h"
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
 /* USER CODE END Includes */
@@ -171,7 +172,19 @@ int main(void)
   }
 
   led_set(LED_IDLE);//connection formed
+
+  //TEST MEMORY
+  ESKF_filter eskf;
+  ESKF_new(&eskf);
+  ESKF_update(&eskf,0,(double*)0,(double*)0,(double*)0,(double*)0,1);
+
+
+
+
   /* USER CODE END 2 */
+
+
+
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -222,7 +235,7 @@ int main(void)
 
 	  __NOP();
 
-
+	  quatexp2(&v,&q1);
 
 	  __NOP();
 

@@ -13,13 +13,14 @@
 /**
  *                        STATE VARIABLE DEFINITION
  * 	State       true        nominal     error       dimension
- * 	position    p_t         p           del_p       3
- *  velocity    v_t         v           del_v       3
- *  rotation    q_t         q           del_q       4
+ * 	position    p_t*        p           del_p       3
+ *  velocity    v_t*        v           del_v       3
+ *  rotation    q_t*        q                  		4
  *  angles vec                          del_theta   3
- *  acc bias    ab_t        ab          del_ab      3
- *  gyro bias   wb_t        wb          del_wb      3
- *  gravity     g_t         g           del_g       3
+ *  acc bias    ab_t*       ab          del_ab      3
+ *  gyro bias   wb_t*       wb          del_wb      3
+ *
+ *  *: does not appear in code
 */
 
 typedef struct{
@@ -144,15 +145,30 @@ typedef struct{
 	//temp variables necessary during computation
 	arm_matrix_instance_f32 am_unbias;
 	float32_t am_unbias_data[3*1];
-
 	arm_matrix_instance_f32 wm_unbias;
 	float32_t wm_unbias_data[3*1];
+
+	arm_matrix_instance_f32 del_q;
+	float32_t del_q_data[4*1];
 
 	arm_matrix_instance_f32 R_hat_am_unbias;// R * hat(am - ab) = R * hat(am_unbias)
 	float32_t R_hat_am_unbias_data[3*3];
 
-	arm_matrix_instance_f32 matexp2_wub_dt;
-	float32_t matexp2_wub_dt_data[3*3];
+	arm_matrix_instance_f32 Fx_T;
+	float32_t Fx_T_data[15*15];
+
+	arm_matrix_instance_f32 Fx_P;
+	float32_t Fx_P_data[15*15];
+
+	arm_matrix_instance_f32 Fi_T;
+	float32_t Fi_T_data[12*15];
+
+	arm_matrix_instance_f32 Fi_Q;
+	float32_t Fi_Q_data[15*12];
+
+	arm_matrix_instance_f32 P_temp;
+	float32_t P_temp_data[15*15];
+
 
 
 }ESKF_filter;

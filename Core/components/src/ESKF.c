@@ -31,6 +31,10 @@
 
 #define GPS_INITIALIZE_COUNT 10		//number of GPS samples collected to initialize local lat/lon origin
 
+#define A_NOISE 1e-2
+#define W_NOISE 1e-4
+#define AB_NOISE 1e-6
+#define WB_NOISE 1e-8
 
 void ESKF_new(ESKF_filter* eskf){
 
@@ -157,9 +161,15 @@ void ESKF_new(ESKF_filter* eskf){
 	arm_mat_init_f32(&eskf->am_unbias,3,1,eskf->am_unbias_data);
 	arm_mat_init_f32(&eskf->wm_unbias,3,1,eskf->wm_unbias_data);
 
-	arm_mat_init_f32(&eskf->R_hat_am_unbias,3,3,eskf->R_hat_am_unbias_data);
-	arm_mat_init_f32(&eskf->matexp2_wub_dt,3,3,eskf->matexp2_wub_dt_data);
+	arm_mat_init_f32(&eskf->del_q,4,1,eskf->del_q_data);
 
+	arm_mat_init_f32(&eskf->R_hat_am_unbias,3,3,eskf->R_hat_am_unbias_data);
+
+	arm_mat_init_f32(&eskf->Fx_T,15,15,eskf->Fx_T_data);
+	arm_mat_init_f32(&eskf->Fx_P,15,15,eskf->Fx_P_data);
+	arm_mat_init_f32(&eskf->P_temp,15,15,eskf->P_temp_data);
+	arm_mat_init_f32(&eskf->Fi_T,12,15,eskf->Fi_T_data);
+	arm_mat_init_f32(&eskf->Fi_Q,15,12,eskf->Fi_Q_data);
 
 }
 
@@ -172,6 +182,9 @@ void ESKF_new(ESKF_filter* eskf){
  * 		- 1 = IMU, 2 = MAG, 3 = GPS
  */
 void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double mm[3], double lla[3], int info){
+
+	//for simplicity
+	float32_t* Q = eskf->Q.pData;
 
 	double mm_norm = sqrt(mm[0]*mm[0] + mm[1]*mm[1] + mm[2]*mm[2]);
 	if (mm_norm != 0){
@@ -232,6 +245,9 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 		arm_matrix_instance_f32 tempvec;
 		float32_t tempvec_data[3*1];
 		arm_mat_init_f32(&tempvec,3,1,tempvec_data);
+		arm_matrix_instance_f32 tempquat;
+		float32_t tempquat_data[4*1];
+		arm_mat_init_f32(&tempquat,4,1,tempquat_data);
 		arm_matrix_instance_f32 tempmat;
 		float32_t tempmat_data[3*3];
 		arm_mat_init_f32(&tempmat,3,3,tempmat_data);
@@ -265,7 +281,11 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 		arm_mat_scale_f32(&tempvec,dt,&tempvec);
 		arm_mat_add_f32(&eskf->v,&tempvec,&eskf->v);
 
-		//update q TODO
+		//update q
+		arm_mat_scale_f32(&eskf->wm_unbias,dt,&tempvec);
+		quatexp2(&tempvec,&eskf->del_q);
+		otimes(&eskf->q,&eskf->del_q,&tempquat);
+		matcpy(&tempquat,&eskf->q);
 
 		//update ab (unchanged)
 		//update wb (unchanged)
@@ -275,7 +295,7 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 
 		//Since we haven't observed the error state(It's reset after every observation),and
 		//its mean is 0. Therefore our best estimate of the error state is 0. Then its mean
-		//does not need to be updated. However, its uncertainty needs to be updated.
+		//does not need to be updated. Its uncertainty, however, needs to be updated.
 
 		/* MATLAB code
 		Fx = eye(15);
@@ -308,9 +328,20 @@ void ESKF_update(ESKF_filter* eskf, double t, double am[3], double wm[3], double
 
 		//fill Fi : Fi does not change. Already done in "ESKF_new".
 
-		//fill Q according to predefined an, wn, abn, wbn.
+		//fill Q according to predefined an, wn, abn, wbn and dt.
+		Q[0] = Q[13] = Q[26] = A_NOISE * dt_2;
+		Q[39] = Q[52] = Q[65] = W_NOISE * dt_2;
+		Q[78] = Q[91] = Q[104] = AB_NOISE * dt;
+		Q[117] = Q[130] = Q[143] = WB_NOISE * dt;
 
-
+		//update P: P = Fx * P * Fx' + Fi * Q_t * Fi';
+		arm_mat_trans_f32(&eskf->Fx,&eskf->Fx_T);
+		arm_mat_mult_f32(&eskf->Fx,&eskf->P,&eskf->Fx_P);
+		arm_mat_mult_f32(&eskf->Fx_P,&eskf->Fx_T,&eskf->P_temp);
+		matcpy(&eskf->P_temp,&eskf->P);
+		arm_mat_mult_f32(&eskf->Fi,&eskf->Q,&eskf->Fi_Q);
+		arm_mat_mult_f32(&eskf->Fi_Q,&eskf->Fi_T,&eskf->P_temp);
+		arm_mat_add_f32(&eskf->P,&eskf->P_temp,&eskf->P);
 	}
 
 	//[MAG Information arrived]
