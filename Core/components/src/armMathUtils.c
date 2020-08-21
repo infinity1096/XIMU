@@ -52,6 +52,22 @@ void matcpy2(arm_matrix_instance_f32* mat1,arm_matrix_instance_f32* mat2,int i, 
 	}
 }
 
+/**
+ * copy chunk with size of mat2 from mat1 into mat2, starting at (i,j) in mat1.
+ *
+ *	TODO validate this function
+ */
+void matslice(arm_matrix_instance_f32* mat1,arm_matrix_instance_f32* mat2,int i, int j){
+
+	int k = i * mat1->numCols + j;
+
+	for (int i2 = 0; i2 < mat2->numRows; i2++){
+		memcpy(mat2->pData + i2 * mat2->numCols, mat1->pData + k, mat2->numCols*sizeof(float32_t));
+		k += mat1->numCols;
+	}
+
+}
+
 void hat(arm_matrix_instance_f32* v_, arm_matrix_instance_f32* v_hat_){
 
 	float32_t* v = v_->pData;

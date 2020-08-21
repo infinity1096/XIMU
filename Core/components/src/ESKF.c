@@ -118,6 +118,10 @@ void ESKF_new(ESKF_filter* eskf){
 	zeros(&eskf->Fi);
 	matcpy2(&eskf->Fi,&eskf->I12,3,0);
 
+	//observation
+	arm_mat_init_f32(&eskf->z_GPS,3,1,eskf->z_GPS_data);
+	arm_mat_init_f32(&eskf->z_MAG,3,1,eskf->z_MAG_data);
+
 	//observation matrix
 	arm_mat_init_f32(&eskf->H_GPS,3,15,eskf->H_GPS_data);
 	arm_mat_init_f32(&eskf->H_MAG,3,15,eskf->H_MAG_data);
@@ -172,6 +176,12 @@ void ESKF_new(ESKF_filter* eskf){
 	arm_mat_init_f32(&eskf->P_temp,15,15,eskf->P_temp_data);
 	arm_mat_init_f32(&eskf->Fi_T,12,15,eskf->Fi_T_data);
 	arm_mat_init_f32(&eskf->Fi_Q,15,12,eskf->Fi_Q_data);
+
+	//MAG
+
+	//GPS
+	arm_mat_init_f32(&eskf->H_GPS_T,15,3,eskf->H_GPS_T_data);
+	arm_mat_trans_f32(&eskf->H_GPS,&eskf->H_GPS_T);
 
 }
 
@@ -365,6 +375,15 @@ void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], 
 
 	//[GPS Information arrived]
 	if (info == 3){
+
+		lla2enu(eskf->lla_origin,lla,eskf->z_GPS_data);
+
+		//H_GPS does not change (unless your IMU and GPS is sepreated by some distance).
+		//Compute Kalman gain. MATLAB code:
+		//      K = P * H' * inv(H * P * H' + V);
+        //		del_x = K * (y - p);
+
+
 
 	}
 }

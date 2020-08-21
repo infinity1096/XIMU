@@ -87,6 +87,13 @@ typedef struct{
 	arm_matrix_instance_f32 Fi;
 	float32_t Fi_data[15*12];
 
+	//observation
+	arm_matrix_instance_f32 z_GPS;
+	float32_t z_GPS_data[3*1];
+
+	arm_matrix_instance_f32 z_MAG;
+	float32_t z_MAG_data[3*1];
+
 	//observation matrix
 	arm_matrix_instance_f32 H_GPS;
 	float32_t H_GPS_data[3*15];
@@ -174,6 +181,11 @@ typedef struct{
 	arm_matrix_instance_f32 P_temp;
 	float32_t P_temp_data[15*15];
 
+	//MAG update related variables
+
+	//GPS update related variables
+	arm_matrix_instance_f32 H_GPS_T;
+	float32_t H_GPS_T_data[15*3];
 
 
 }ESKF_filter;
