@@ -1,2 +1,2 @@
-i2c.c:10:9:I2C_read	32	static,ignoring_inline_asm
-i2c.c:18:9:I2C_write	32	static,ignoring_inline_asm
+i2c.c:10:9:I2C_read	24	static,ignoring_inline_asm
+i2c.c:18:9:I2C_write	24	static,ignoring_inline_asm

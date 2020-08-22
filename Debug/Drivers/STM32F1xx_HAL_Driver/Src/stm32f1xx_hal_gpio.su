@@ -1,4 +1,4 @@
-stm32f1xx_hal_gpio.c:178:6:HAL_GPIO_Init	56	static
+stm32f1xx_hal_gpio.c:178:6:HAL_GPIO_Init	48	static
 stm32f1xx_hal_gpio.c:351:6:HAL_GPIO_DeInit	48	static
 stm32f1xx_hal_gpio.c:431:15:HAL_GPIO_ReadPin	0	static
 stm32f1xx_hal_gpio.c:465:6:HAL_GPIO_WritePin	0	static

@@ -317,7 +317,7 @@ void TIM3_IRQHandler(void)
 
 			XIMU_sens.m_ts = millis();
 
-			calc_magnetic_orientation();
+			//calc_magnetic_orientation();
 		}
 
 		//poll DMA buffer

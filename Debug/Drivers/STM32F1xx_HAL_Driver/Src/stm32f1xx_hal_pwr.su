@@ -2,7 +2,7 @@ stm32f1xx_hal_pwr.c:117:13:PWR_OverloadWfe	0	static,ignoring_inline_asm
 stm32f1xx_hal_pwr.c:156:6:HAL_PWR_DeInit	0	static
 stm32f1xx_hal_pwr.c:169:6:HAL_PWR_EnableBkUpAccess	0	static
 stm32f1xx_hal_pwr.c:182:6:HAL_PWR_DisableBkUpAccess	0	static
-stm32f1xx_hal_pwr.c:316:6:HAL_PWR_ConfigPVD	4	static
+stm32f1xx_hal_pwr.c:316:6:HAL_PWR_ConfigPVD	0	static
 stm32f1xx_hal_pwr.c:359:6:HAL_PWR_EnablePVD	0	static
 stm32f1xx_hal_pwr.c:369:6:HAL_PWR_DisablePVD	0	static
 stm32f1xx_hal_pwr.c:382:6:HAL_PWR_EnableWakeUpPin	0	static,ignoring_inline_asm

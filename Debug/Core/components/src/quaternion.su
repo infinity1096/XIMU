@@ -4,6 +4,6 @@ quaternion.c:97:6:quat_L	0	static
 quaternion.c:115:6:quat_R	0	static
 quaternion.c:134:6:otimes	88	static
 quaternion.c:146:6:quatexp2	32	static
-quaternion.c:170:6:diff_qvq_diff_a	56	static
+quaternion.c:170:6:diff_qvq_diff_a	0	static
 quaternion.c:174:6:diff_qvq_diff_q	24	static
-quaternion.c:201:6:diff_q_diff_dtheta	8	static
+quaternion.c:201:6:diff_q_diff_dtheta	4	static

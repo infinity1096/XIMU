@@ -2,4 +2,4 @@ ESKF.c:39:6:ESKF_new	48	static
 ESKF.c:480:6:inject_error_state	56	static
 ESKF.c:542:6:lla2xyz	56	static
 ESKF.c:516:6:lla2enu	72	static
-ESKF.c:211:6:ESKF_update	184	static
+ESKF.c:211:6:ESKF_update	192	static

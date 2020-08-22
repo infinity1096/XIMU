@@ -72,7 +72,7 @@ DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE BEGIN PV */
 XIMU_STATE ximu_state;
-
+//ESKF_filter eskf;
 
 /* USER CODE END PV */
 
@@ -162,8 +162,6 @@ int main(void)
   /*
   	  GPS INIT
   */
-  double ax,ay,az,gx,gy,gz,mx,my,mz;
-  double pressure, tempe;
 
   led_set(LED_DISCONNECTED);//Fault cleared
 
@@ -174,18 +172,22 @@ int main(void)
   led_set(LED_IDLE);//connection formed
 
   //TEST MEMORY
-  ESKF_filter eskf;
+
   ESKF_new(&eskf);
   //ESKF_update(&eskf,0,(double*)0,(double*)0,(double*)0,(double*)0,1);
 
 
   float32_t am[3] = {0,0,-9.81};
   float32_t wm[3] = {0,0,0};
-  float32_t mm[3] = {0,1,0};
-  float32_t lla[3] = {1,2,3};
-
-  ESKF_update(&eskf,0.01,am,wm,mm,lla,1);
-
+  float32_t mm[3] = {0,1,1};
+  float32_t lla[3] = {38,118,100};
+/*
+  for (int i = 0; i < 10; i++){
+	  ESKF_update(&eskf,0.01*i,am,wm,mm,lla,1);
+	  ESKF_update(&eskf,0.01*i,am,wm,mm,lla,2);
+	  ESKF_update(&eskf,0.01*i,am,wm,mm,lla,3);
+  }
+*/
   /* USER CODE END 2 */
 
 
