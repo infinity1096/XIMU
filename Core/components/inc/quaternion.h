@@ -11,6 +11,7 @@
 #include "arm_math.h"
 
 void quat2mat(arm_matrix_instance_f32* q_,arm_matrix_instance_f32* R_);
+void mat2quat(arm_matrix_instance_f32* R_,arm_matrix_instance_f32* q_);
 void quat_L(arm_matrix_instance_f32* q_, arm_matrix_instance_f32* qL_);
 void quat_R(arm_matrix_instance_f32* q_, arm_matrix_instance_f32* qR_);
 void quatexp2(arm_matrix_instance_f32* phi_, arm_matrix_instance_f32* q_);

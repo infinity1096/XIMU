@@ -6,3 +6,5 @@ armMathUtils.c:60:6:matslice	24	static
 armMathUtils.c:71:6:hat	8	static
 armMathUtils.c:86:6:vee	16	static
 armMathUtils.c:98:6:matexp2	120	static
+armMathUtils.c:133:6:normalize	24	static
+armMathUtils.c:142:6:cross	64	static

@@ -212,10 +212,6 @@ typedef struct{
 	float32_t K_GPS_T_data[3*15];
 
 
-
-
-
-
 	//shared between MAG and GPS update
 	arm_matrix_instance_f32 del_x;
 	float32_t del_x_data[15*1];

@@ -45,7 +45,7 @@ void calc_absolute_acceleration() {
 	XIMU_u.az_abs = (az*q0q0 + 2*ay*q0q1 - 2*ax*q0q2 - az*q1q1 + 2*ax*q1q3 - az*q2q2 + 2*ay*q2q3 + az*q3q3)/norm_2;
 }
 
-void normalize(double v[3]){
+void normalize2(double v[3]){
 	double norm = sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 	v[0] /= norm;
 	v[1] /= norm;
@@ -77,7 +77,7 @@ void calc_magnetic_orientation(){
 	m[1] = XIMU_sens.mx;
 	m[2] = -XIMU_sens.mz;
 
-	normalize(m);
+	normalize2(m);
 
 	//step1: cross gravity(negative acceleration) and magnetic field to get reference direction of East
 	double East_ref[3] = {0};
@@ -86,7 +86,7 @@ void calc_magnetic_orientation(){
 	East_ref[1] = g[2]*m[0] - g[0]*m[2];
 	East_ref[2] = g[0]*m[1] - g[1]*m[0];
 
-	normalize(East_ref);
+	normalize2(East_ref);
 
 	//step2: cross East and gravity(negative acceleration) to get reference direction of North
 	double North_ref[3] = {0};
@@ -95,7 +95,7 @@ void calc_magnetic_orientation(){
 	North_ref[1] = East_ref[2]*g[0] - East_ref[0]*g[2];
 	North_ref[2] = East_ref[0]*g[1] - East_ref[1]*g[0];
 
-	normalize(North_ref);
+	normalize2(North_ref);
 
 	//optional: rotate north and east according to magnetic field inclination
 

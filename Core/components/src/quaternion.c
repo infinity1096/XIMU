@@ -43,6 +43,54 @@ void quat2mat(arm_matrix_instance_f32* q_,arm_matrix_instance_f32* R_){
 	R[8] = q0_2 - q1_2 - q2_2 + q3_2;
 }
 
+void mat2quat(arm_matrix_instance_f32* R_,arm_matrix_instance_f32* q_){
+
+	float32_t* R = R_->pData;
+	float32_t* q = q_->pData;
+
+	double t;
+	if (R[8] < 0){
+		if (R[0] > R[4]){
+			t = 1 + R[0] - R[4] - R[8];
+
+			q[0] = R[7]-R[5];
+			q[1] = t;
+			q[2] = R[3]+R[1];
+			q[3] = R[2]+R[6];
+		}else{
+			t = 1 - R[0] + R[4] - R[8];
+
+			q[0] = R[2]-R[6];
+			q[1] = R[3]+R[1];
+			q[2] = t;
+			q[3] = R[7]+R[5];
+		}
+	 }else{
+		 if (R[0] < -R[4]){
+			 t = 1 - R[0] - R[4] + R[8];
+
+			 q[0] = R[3]-R[1];
+			 q[1] = R[2]+R[6];
+			 q[2] = R[7]+R[5];
+			 q[3] = t;
+		 }else{
+			 t = 1 + R[0] + R[4] + R[8];
+
+			 q[0] = t;
+			 q[1] = R[7]-R[5];
+			 q[2] = R[2]-R[6];
+			 q[3] = R[3]-R[1];
+		 }
+	 }
+
+	//normalize
+	arm_mat_scale_f32(q_,0.5f / sqrt(t),q_);
+}
+
+
+
+
+
 /*
  * Matrix equivalent to left quaternion multiplication
  */

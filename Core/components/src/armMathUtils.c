@@ -130,6 +130,24 @@ void matexp2(arm_matrix_instance_f32* phi_, arm_matrix_instance_f32* R_){
 	}
 }
 
+void normalize(arm_matrix_instance_f32* v_){
+	float32_t* v = v_->pData;
+	float32_t norm = v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
+
+	arm_sqrt_f32(norm,&norm);
+
+	arm_mat_scale_f32(v_,1.0/norm,v_);
+}
+
+void cross(arm_matrix_instance_f32* v1_, arm_matrix_instance_f32* v2_, arm_matrix_instance_f32* vres_){
+
+	arm_matrix_instance_f32 v1_hat;
+	float32_t v1_hat_data[3*3];
+	arm_mat_init_f32(&v1_hat,3,3,v1_hat_data);
+
+	arm_mat_mult_f32(&v1_hat,v2_,vres_);
+}
+
 
 
 

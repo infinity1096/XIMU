@@ -238,19 +238,53 @@ void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], 
 			if (eskf->IMU_init_count == IMU_INITIALIZE_COUNT){
 				arm_mat_scale_f32(&eskf->am_init,1.0/IMU_INITIALIZE_COUNT,&eskf->am_init);
 
-				//calculate initial orientation
-
-
-
 				eskf->IMU_initialized = 1;
 			}
 		}
 
 		if (info == 2 && eskf->MAG_initialized == 0){
 
+			if (eskf->MAG_init_count < MAG_INITIALIZE_COUNT){
+				arm_mat_add_f32(&eskf->mm,&eskf->mm_init,&eskf->mm_init);
+				eskf->MAG_init_count++;
+			}
+
+			if (eskf->MAG_init_count == MAG_INITIALIZE_COUNT && eskf->IMU_initialized == 1){
+				arm_mat_scale_f32(&eskf->mm_init,1/MAG_INITIALIZE_COUNT,&eskf->mm_init);
+
+				//calculate initial orientation with IMU init data
+				arm_matrix_instance_f32 I_R_G,G_R_I;
+				float32_t I_R_G_data[3*3];
+				float32_t G_R_I_data[3*3];
+				arm_mat_init_f32(&I_R_G,3,3,I_R_G_data);//I_R_G, global to local(Imu frame).
+				arm_mat_init_f32(&G_R_I,3,3,G_R_I_data);//G_R_I, local to global.
 
 
+				arm_matrix_instance_f32 X_ref;
+				float32_t X_ref_data[3*1];
+				arm_mat_init_f32(&X_ref,3,1,X_ref_data);
 
+
+				//normalize mag and acc
+				normalize(&eskf->mm_init);// Y axis ref
+				normalize(&eskf->am_init);// Z axis ref, negative g.
+
+				cross(&eskf->mm_init,&eskf->am_init,&X_ref);//cross Y and Z to get X
+				normalize(&X_ref);
+
+				//fill I_R_G
+				matcpy2(&I_R_G,&X_ref,0,0);
+				matcpy2(&I_R_G,&eskf->mm_init,0,1);
+				matcpy2(&I_R_G,&eskf->am_init,0,2);
+
+				//transpose I_R_G to get G_R_I, which is the rotation matrix we used in the state
+				//to represent orientation.
+				arm_mat_trans_f32(&I_R_G,&G_R_I);
+
+				//convert to quaternion and save as initial orientation
+				mat2quat(&G_R_I,&eskf->q);
+				eskf->MAG_initialized = 1;
+			}
 		}
 
 		if (info == 3 && eskf->GPS_initialized == 0){
@@ -268,8 +302,8 @@ void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], 
 			}
 		}
 
-		//eskf->last_t = t; TODO only for testing
-		//return; TODO only for testing
+		eskf->last_t = t;
+		return;
 	}
 
 	//[IMU Information arrived]
