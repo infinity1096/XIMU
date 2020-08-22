@@ -177,12 +177,27 @@ void ESKF_new(ESKF_filter* eskf){
 	arm_mat_init_f32(&eskf->Fi_T,12,15,eskf->Fi_T_data);
 	arm_mat_init_f32(&eskf->Fi_Q,15,12,eskf->Fi_Q_data);
 
-	//MAG
+	//MAG update related variables
 
-	//GPS
+	//GPS update related variables
 	arm_mat_init_f32(&eskf->H_GPS_T,15,3,eskf->H_GPS_T_data);
 	arm_mat_trans_f32(&eskf->H_GPS,&eskf->H_GPS_T);
 
+	arm_mat_init_f32(&eskf->COV_GPS,3,3,eskf->COV_GPS_data);
+	arm_mat_init_f32(&eskf->inv_COV_GPS,3,3,eskf->inv_COV_GPS_data);
+	arm_mat_init_f32(&eskf->P_H_GPS_T,15,3,eskf->P_H_GPS_T_data);
+
+	arm_mat_init_f32(&eskf->z_hx_GPS,3,1,eskf->z_hx_GPS_data);
+
+	arm_mat_init_f32(&eskf->I_KH_GPS,15,15,eskf->I_KH_GPS_data);
+	arm_mat_init_f32(&eskf->I_KH_GPS_T,15,15,eskf->I_KH_GPS_T_data);
+
+	arm_mat_init_f32(&eskf->KV_GPS,15,3,eskf->KV_GPS_data);
+	arm_mat_init_f32(&eskf->K_GPS_T,3,15,eskf->K_GPS_T_data);
+
+
+	//shared between MAG and GPS update
+	arm_mat_init_f32(&eskf->del_x,15,1,eskf->del_x_data);
 }
 
 /**
@@ -343,7 +358,7 @@ void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], 
 		matcpy2(&eskf->Fx,&tempmat,3,9);
 		//
 		arm_mat_scale_f32(&eskf->wm_unbias,-dt,&tempvec);//changed dt to -dt is equivalent to transpose
-		matexp2(&tempvec,&tempmat);//TODO gives nan data
+		matexp2(&tempvec,&tempmat);
 		matcpy2(&eskf->Fx,&tempmat,6,6);
 		//
 		arm_mat_scale_f32(&eskf->I3,-dt,&tempmat);
@@ -381,12 +396,76 @@ void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], 
 		//H_GPS does not change (unless your IMU and GPS is sepreated by some distance).
 		//Compute Kalman gain. MATLAB code:
 		//      K = P * H' * inv(H * P * H' + V);
-        //		del_x = K * (y - p);
+        //		del_x = K * (z - p);
+		//
+		//	since H = [I 0 0 0 0], H*P*H' = P(1:3,1:3)
 
+		matslice(&eskf->P,&eskf->COV_GPS,0,0);
+		arm_mat_add_f32(&eskf->COV_GPS,&eskf->V_GPS,&eskf->COV_GPS);
+		arm_mat_inverse_f32(&eskf->COV_GPS,&eskf->inv_COV_GPS);
 
+		arm_mat_mult_f32(&eskf->P,&eskf->H_GPS_T,&eskf->P_H_GPS_T);
+		arm_mat_mult_f32(&eskf->P_H_GPS_T,&eskf->inv_COV_GPS,&eskf->K_GPS);
 
+		arm_mat_sub_f32(&eskf->z_GPS,&eskf->p,&eskf->z_hx_GPS);
+		arm_mat_mult_f32(&eskf->K_GPS,&eskf->z_hx_GPS,&eskf->del_x);
+
+		//update covariance. MATLAB code:
+		//P = (eye(15) - K * H) * P * (eye(15) - K * H)' + K * V * K';
+		//since H [I 0 0 0 0], K * H = [K zeros(15,12)]
+
+		zeros(&eskf->I_KH_GPS);
+		matcpy2(&eskf->I_KH_GPS,&eskf->K_GPS,0,0);
+		arm_mat_scale_f32(&eskf->I_KH_GPS,-1,&eskf->I_KH_GPS);//now &eskf->I_KH_GPS = -K*H
+		arm_mat_add_f32(&eskf->I_KH_GPS,&eskf->I15,&eskf->I_KH_GPS);
+		arm_mat_trans_f32(&eskf->I_KH_GPS,&eskf->I_KH_GPS_T);
+
+		//update P
+		arm_mat_mult_f32(&eskf->I_KH_GPS,&eskf->P,&eskf->P_temp);
+		matcpy(&eskf->P_temp,&eskf->P);
+		arm_mat_mult_f32(&eskf->P,&eskf->I_KH_GPS_T,&eskf->P_temp);
+		matcpy(&eskf->P_temp,&eskf->P);
+
+		arm_mat_trans_f32(&eskf->K_GPS,&eskf->K_GPS_T);
+		arm_mat_mult_f32(&eskf->K_GPS,&eskf->V_GPS,&eskf->KV_GPS);
+		arm_mat_mult_f32(&eskf->KV_GPS,&eskf->K_GPS_T,&eskf->P_temp);
+		arm_mat_add_f32(&eskf->P,&eskf->P_temp,&eskf->P);
+
+		inject_error_state(eskf);
 	}
 }
+
+/**
+ * inject error into nominal state, and then reset error state.
+ */
+void inject_error_state(ESKF_filter* eskf){
+
+	arm_matrix_instance_f32 tempquat;
+	float32_t tempquat_data[4*1];
+	arm_mat_init_f32(&tempquat,4,1,tempquat_data);
+
+	//copy data in del_x to corresponding error state
+	matslice(&eskf->del_x,&eskf->del_p,0,0);
+	matslice(&eskf->del_x,&eskf->del_v,3,0);
+	matslice(&eskf->del_x,&eskf->del_theta,6,0);
+	matslice(&eskf->del_x,&eskf->del_ab,9,0);
+	matslice(&eskf->del_x,&eskf->del_wb,12,0);
+
+	//inject error states into nominal states
+	arm_mat_add_f32(&eskf->p,&eskf->del_p,&eskf->p);
+	arm_mat_add_f32(&eskf->v,&eskf->del_v,&eskf->v);
+
+	quatexp2(&eskf->del_theta,&eskf->del_q);
+	otimes(&eskf->q,&eskf->del_q,&tempquat);
+	matcpy(&tempquat,&eskf->q);
+
+	arm_mat_add_f32(&eskf->ab,&eskf->del_ab,&eskf->ab);
+	arm_mat_add_f32(&eskf->wb,&eskf->del_wb,&eskf->wb);
+
+	//no need to reset del_p ~ del_wb to zero, since they always
+	//get their value here.
+}
+
 
 /**
  * convert lla - latitude, longitude, altitude in WGS84 coordinate

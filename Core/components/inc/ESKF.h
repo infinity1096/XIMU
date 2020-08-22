@@ -187,11 +187,45 @@ typedef struct{
 	arm_matrix_instance_f32 H_GPS_T;
 	float32_t H_GPS_T_data[15*3];
 
+	arm_matrix_instance_f32 COV_GPS;//observer covariance
+	float32_t COV_GPS_data[3*3];
+
+	arm_matrix_instance_f32 inv_COV_GPS;
+	float32_t inv_COV_GPS_data[3*3];
+
+	arm_matrix_instance_f32 P_H_GPS_T;
+	float32_t P_H_GPS_T_data[15*3];
+
+	arm_matrix_instance_f32 z_hx_GPS;// z - h(x)
+	float32_t z_hx_GPS_data[3*1];
+
+	arm_matrix_instance_f32 I_KH_GPS;// I - KH
+	float32_t I_KH_GPS_data[15*15];
+
+	arm_matrix_instance_f32 I_KH_GPS_T;// I - KH
+	float32_t I_KH_GPS_T_data[15*15];
+
+	arm_matrix_instance_f32 KV_GPS;// K * V
+	float32_t KV_GPS_data[15*3];
+
+	arm_matrix_instance_f32 K_GPS_T;
+	float32_t K_GPS_T_data[3*15];
+
+
+
+
+
+
+	//shared between MAG and GPS update
+	arm_matrix_instance_f32 del_x;
+	float32_t del_x_data[15*1];
+
 
 }ESKF_filter;
 
 void ESKF_new(ESKF_filter* eskf);
 void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], float32_t mm[3], float32_t lla[3], int info);
+void inject_error_state(ESKF_filter* eskf);
 
 void lla2enu(float32_t lla_ref[3], float32_t lla[3], float32_t enu[3]);
 void lla2xyz(float32_t lla[3], float32_t xyz[3]);

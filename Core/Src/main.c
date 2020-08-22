@@ -196,16 +196,6 @@ int main(void)
   while (1){
 	  led_set(LED_MEASURING);
 
-	  float32_t lla_ref[3] = {10,10,100};
-	  float32_t lla[3] = {11,12,200};
-	  float32_t enu[3] = {0,0,0};
-
-	  lla2enu(lla,lla_ref,enu);
-
-
-
-
-
 
 	  int i = 0;
 
