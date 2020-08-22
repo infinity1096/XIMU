@@ -260,21 +260,26 @@ void ESKF_update(ESKF_filter* eskf, double t, float32_t am[3], float32_t wm[3], 
 				arm_mat_init_f32(&G_R_I,3,3,G_R_I_data);//G_R_I, local to global.
 
 
-				arm_matrix_instance_f32 X_ref;
-				float32_t X_ref_data[3*1];
+				arm_matrix_instance_f32 X_ref,Y_ref;
+				float32_t X_ref_data[3*1],Y_ref_data[3*1];
 				arm_mat_init_f32(&X_ref,3,1,X_ref_data);
+				arm_mat_init_f32(&Y_ref,3,1,Y_ref_data);
 
 
 				//normalize mag and acc
-				normalize(&eskf->mm_init);// Y axis ref
+				normalize(&eskf->mm_init);
 				normalize(&eskf->am_init);// Z axis ref, negative g.
 
-				cross(&eskf->mm_init,&eskf->am_init,&X_ref);//cross Y and Z to get X
+				cross(&eskf->mm_init,&eskf->am_init,&X_ref);//cross Y and Z_ref to get X_ref(East)
+				//NOTE: Y(magnetic field north) is usually not parallel with ground.
 				normalize(&X_ref);
+
+				//cross Z_ref and X_ref to get Y_ref
+				cross(&eskf->am_init,&X_ref,&Y_ref);
 
 				//fill I_R_G
 				matcpy2(&I_R_G,&X_ref,0,0);
-				matcpy2(&I_R_G,&eskf->mm_init,0,1);
+				matcpy2(&I_R_G,&Y_ref,0,1);
 				matcpy2(&I_R_G,&eskf->am_init,0,2);
 
 				//transpose I_R_G to get G_R_I, which is the rotation matrix we used in the state
