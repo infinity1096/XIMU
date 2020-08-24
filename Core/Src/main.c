@@ -173,7 +173,7 @@ int main(void)
 
   //TEST MEMORY
 
-  ESKF_new(&eskf);
+  //ESKF_new(&eskf);
   //ESKF_update(&eskf,0,(double*)0,(double*)0,(double*)0,(double*)0,1);
 
 
