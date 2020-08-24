@@ -146,20 +146,6 @@ int GNSS_RX_Update(){
 	return new_information;
 }
 
-/**
- * return latitude obtained by GNSS
- */
-double GNSS_get_lat(){
-	return GNSS.GNGGA.lat;
-}
-
-/**
- * return longitude obtained by GNSS
- */
-double GNSS_get_lon(){
-	return GNSS.GNGGA.lon;
-}
-
 
 
 

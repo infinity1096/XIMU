@@ -8,18 +8,15 @@
 
 #include "ms5611.h"
 #include "i2c.h"
-#include "systick.h"
-#include "dataProcessing.h"
+
 
 
 #define NUM_CALIBRATION_DATA 6
-#define TEMP_READ_INTERVAL 10 //read temperature every 50 cycle
+
 
 uint16_t fc[NUM_CALIBRATION_DATA]; // 6 factory calibration data
 uint32_t raw_pressure, raw_temperature;
 enum MS5611_OSR selected_osr = MS5611_OSR_4096;
-
-uint8_t read_index = 0;
 
 
 /**
@@ -128,7 +125,7 @@ void ms5611_retrieve_temperature(){
 void ms5611_update_pressure(){
 
 	ms5611_request_pressure();
-	delay(12);//time delay necessary for ADC to convert, must be >= 9.02ms
+	HAL_Delay(12);//time delay necessary for ADC to convert, must be >= 9.02ms
 	ms5611_retrieve_pressure();
 
 }
@@ -139,7 +136,7 @@ void ms5611_update_pressure(){
 void ms5611_update_temperature(){
 
 	ms5611_request_temperature();
-	delay(12);//time delay necessary for ADC to convert, must be >= 9.02ms
+	HAL_Delay(12);//time delay necessary for ADC to convert, must be >= 9.02ms
 	ms5611_retrieve_temperature();
 
 }
@@ -150,35 +147,6 @@ void ms5611_update_temperature(){
 void ms5611_update(){
 	ms5611_update_temperature();
 	ms5611_update_pressure();
-}
-
-/**
- * call this with a 100Hz timer to continuously read the sensor
- * this will update pressure value for most of the time. When the
- * read_index counter reaches 0, it will update temperature. the counter
- * resets when it reaches TEMP_READ_INTERVAL.
- *
- * In other words, this function will update temperature every TEMP_READ_INTERVAL cycles.
- */
-void ms5611_timer_update(){
-
-	if (read_index == 0){
-		ms5611_retrieve_temperature();
-		XIMU_sens.temperature = ms5611_get_temperature();
-		ms5611_request_pressure();
-		read_index++;
-	}else if (read_index == TEMP_READ_INTERVAL - 1){
-		ms5611_retrieve_pressure();
-		XIMU_sens.pressure = ms5611_get_pressure();
-		ms5611_request_temperature();
-		read_index = 0;
-	}else{
-		ms5611_retrieve_pressure();
-		XIMU_sens.pressure = ms5611_get_pressure();
-		ms5611_request_pressure();
-		read_index++;
-	}
-	XIMU_sens.pt_ts = millis();
 }
 
 /**

@@ -3,5 +3,3 @@ gnss.c:19:6:parse_GNGGA	20	static
 gnss.c:43:8:convert_raw_lat_lon	24	static
 gnss.c:52:6:GNSS_Init	0	static
 gnss.c:57:5:GNSS_RX_Update	240	static,ignoring_inline_asm
-gnss.c:152:8:GNSS_get_lat	0	static
-gnss.c:159:8:GNSS_get_lon	0	static

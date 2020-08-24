@@ -48,8 +48,6 @@ void ms5611_update_temperature();
 
 void ms5611_update();
 
-void ms5611_timer_update();
-
 double ms5611_get_temperature();
 double ms5611_get_pressure();
 

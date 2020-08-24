@@ -1,5 +1,8 @@
-usbd_cdc_if.c:169:15:CDC_DeInit_FS	0	static
-usbd_cdc_if.c:183:15:CDC_Control_FS	0	static
-usbd_cdc_if.c:263:15:CDC_Receive_FS	8	static
-usbd_cdc_if.c:155:15:CDC_Init_FS	8	static
-usbd_cdc_if.c:283:9:CDC_Transmit_FS	8	static
+usbd_cdc_if.c:175:15:CDC_DeInit_FS	0	static
+usbd_cdc_if.c:189:15:CDC_Control_FS	0	static
+usbd_cdc_if.c:269:15:CDC_Receive_FS	24	static
+usbd_cdc_if.c:160:15:CDC_Init_FS	8	static
+usbd_cdc_if.c:302:9:CDC_Transmit_FS	8	static
+usbd_cdc_if.c:318:5:vcp_available	0	static
+usbd_cdc_if.c:323:5:vcp_read	0	static
+usbd_cdc_if.c:338:6:vcp_write	16	static

@@ -28,8 +28,7 @@ Core/components/src/mpu9250.o: ../Core/components/src/mpu9250.c \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/systick.h
+ ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h
 
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/mpu9250.h:
 
@@ -90,5 +89,3 @@ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/i2c.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h:
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
-
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/systick.h:

@@ -35,7 +35,7 @@ USB_DEVICE/App/usbd_cdc_if.o: ../USB_DEVICE/App/usbd_cdc_if.c \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/led.h
+ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/ros_lib/rosserial_utils.h
 
 ../USB_DEVICE/App/usbd_cdc_if.h:
 
@@ -111,4 +111,4 @@ USB_DEVICE/App/usbd_cdc_if.o: ../USB_DEVICE/App/usbd_cdc_if.c \
 
 ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h:
 
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/led.h:
+C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/ros_lib/rosserial_utils.h:

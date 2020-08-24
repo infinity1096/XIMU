@@ -23,7 +23,8 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-#include "led.h";
+#include "stdint.h"
+#include "rosserial_utils.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,7 +33,11 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+#define USB_RX_DATA_SIZE 2048
 
+uint8_t usb_rxBuffer[USB_RX_DATA_SIZE];
+uint32_t usb_rxBufPtrIn = 0;
+uint32_t usb_rxBufPtrOut = 0;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -65,8 +70,8 @@
 /* USER CODE BEGIN PRIVATE_DEFINES */
 /* Define size for the receive and transmit buffer over CDC */
 /* It's up to user to redefine and/or remove those define */
-#define APP_RX_DATA_SIZE  1000
-#define APP_TX_DATA_SIZE  1000
+#define APP_RX_DATA_SIZE  2048
+#define APP_TX_DATA_SIZE  2048
 /* USER CODE END PRIVATE_DEFINES */
 
 /**
@@ -158,6 +163,7 @@ static int8_t CDC_Init_FS(void)
   /* Set Application Buffers */
   USBD_CDC_SetTxBuffer(&hUsbDeviceFS, UserTxBufferFS, 0);
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, UserRxBufferFS);
+  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
   /* USER CODE END 3 */
 }
@@ -263,6 +269,19 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
+	  uint32_t i;
+	  uint16_t in;
+
+	  for(i = 0; i < *Len; ++i)
+	  {
+	    in = (usb_rxBufPtrIn + 1) % USB_RX_DATA_SIZE;
+	    if(in != usb_rxBufPtrOut) //USB ring buffer not full
+	    {
+	      usb_rxBuffer[usb_rxBufPtrIn] = Buf[i];
+	      usb_rxBufPtrIn = in;
+	    }
+	  }
+
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
@@ -296,6 +315,30 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
+int vcp_available(void)
+{
+  return ((uint32_t)(USB_RX_DATA_SIZE + usb_rxBufPtrIn - usb_rxBufPtrOut)) % USB_RX_DATA_SIZE;
+}
+
+int vcp_read(void)
+{
+  // if the head isn't ahead of the tail, we don't have any characters
+  if(usb_rxBufPtrIn == usb_rxBufPtrOut)
+  {
+    return -1;
+  }
+  else
+  {
+    unsigned char ch = usb_rxBuffer[usb_rxBufPtrOut];
+    usb_rxBufPtrOut = (uint16_t)(usb_rxBufPtrOut + 1) % USB_RX_DATA_SIZE;
+    return ch;
+  }
+}
+
+void vcp_write(uint8_t* Buf, uint16_t Len)
+{
+  while(CDC_Transmit_FS(Buf, Len) != HAL_OK);
+}
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 /**

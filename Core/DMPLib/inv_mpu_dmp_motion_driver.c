@@ -977,7 +977,7 @@ int dmp_read_fifo(short *gyro, short *accel, long *quat,
         sensors[0] |= INV_XYZ_GYRO;
     }
 
-    get_ms(timestamp);
+    //get_ms(timestamp);
     return 0;
 }
 

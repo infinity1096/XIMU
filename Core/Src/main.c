@@ -24,26 +24,26 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stdlib.h"
+#include "string.h"
+
+//sensors
 #include "mpu9250.h"
 #include "inv_mpu_dmp_motion_driver.h"
 
 #include "ms5611.h"
 
-#include "systick.h"
+#include "gnss.h"
+
+//status light
 #include "led.h"
 
-#include <stdlib.h>
-#include "string.h"
-
-#include "dataProcessing.h"
 #include "XIMU_conf.h"
 
-#include "arm_math.h"
-#include "armMathUtils.h"
-#include "quaternion.h"
-#include "ESKF.h"
+#include "rosserial_utils.h"
 
 extern USBD_HandleTypeDef hUsbDeviceFS;
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -72,8 +72,14 @@ DMA_HandleTypeDef hdma_usart1_rx;
 
 /* USER CODE BEGIN PV */
 XIMU_STATE ximu_state;
-//ESKF_filter eskf;
 
+int send_imu_data = 0;
+int send_mag_data = 0;
+int send_gps_data = 0;
+int send_pt_data = 0;
+//accel gyro quaternion(DMP) megnetic_field latitude-longitude-altitude pressure-temperature
+
+double a[3] = {0}, w[3] = {0}, q[4] = {0}, m[3] = {0}, lla[3] = {0}, pt[2] = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -127,7 +133,6 @@ int main(void)
   MX_TIM3_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  systickInit();
 
   HAL_TIM_Base_Start_IT(&htim2);
 
@@ -169,42 +174,41 @@ int main(void)
 	  led_set(LED_DISCONNECTED);//wait for connection
   }
 
+  ros_init();
+
   led_set(LED_IDLE);//connection formed
-
-  //TEST MEMORY
-
-  //ESKF_new(&eskf);
-  //ESKF_update(&eskf,0,(double*)0,(double*)0,(double*)0,(double*)0,1);
-
-
-  float32_t am[3] = {0,0,-9.81};
-  float32_t wm[3] = {0,0,0};
-  float32_t mm[3] = {0,1,1};
-  float32_t lla[3] = {38,118,100};
-/*
-  for (int i = 0; i < 10; i++){
-	  ESKF_update(&eskf,0.01*i,am,wm,mm,lla,1);
-	  ESKF_update(&eskf,0.01*i,am,wm,mm,lla,2);
-	  ESKF_update(&eskf,0.01*i,am,wm,mm,lla,3);
-  }
-*/
   /* USER CODE END 2 */
-
-
-
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1){
 	  led_set(LED_MEASURING);
+	  if (send_imu_data == 1 || send_mag_data == 1 || send_gps_data == 1 || send_pt_data == 1){
 
+		  if (send_imu_data == 1){
+			  IMU_pub(a,w,q);
+			  send_imu_data = 0;
+		  }
 
-	  int i = 0;
+		  if (send_mag_data == 1){
+			  MAG_pub(m);
+			  send_mag_data = 0;
+		  }
 
+		  if (send_gps_data == 1){
+			  GPS_pub(lla);
+			  send_gps_data = 0;
+		  }
 
-	  HAL_Delay(10);
+		  if (send_pt_data == 1){
+		  	  PT_pub(pt);
+		  	  send_pt_data = 0;
+		  }
+
+		  spinOnce();
+	  }
+
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -457,6 +461,27 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+ /**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

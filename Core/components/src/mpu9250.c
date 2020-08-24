@@ -6,7 +6,7 @@
  */
 
 #include "mpu9250.h"
-#include "systick.h"
+#include "stm32f1xx_hal.h"
 #include <math.h>
 
 double 		ax = 0,		ay = 0,		az = 0,	//Acceleration xyz
@@ -50,11 +50,11 @@ int i2c_read(unsigned char slave_addr, unsigned char reg_addr,
 }
 
 void delay_ms(unsigned long num_ms){
-	delay(num_ms);
+	HAL_Delay(num_ms);
 }
 
 unsigned long get_ms(unsigned long *count){
-	*count = millis();
+	*count = HAL_GetTick();
 }
 
 // Functions implemented for this platform(STM32F103) for DMP

@@ -19,10 +19,10 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include "main.h"
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "systick.h"
 #include "led.h"
 #include "ms5611.h"
 #include "mpu9250.h"
@@ -38,6 +38,7 @@
 #include "gnss.h"
 #include "string.h"
 
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +48,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
+#define TEMP_READ_INTERVAL 10
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -57,7 +58,17 @@ extern uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+extern int send_imu_data;
+extern int send_mag_data;
+extern int send_gps_data;
+extern int send_pt_data;
+
+extern double a[3], w[3], q[4], m[3], lla[3], pt[2];
+
+int initialize = 0;
+
 short timer_index = 0;
+int ms5611_read_index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,6 +86,8 @@ extern PCD_HandleTypeDef hpcd_USB_FS;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern DMA_HandleTypeDef hdma_usart1_rx;
+extern TIM_HandleTypeDef htim1;
+
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -202,9 +215,9 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
+  
   /* USER CODE BEGIN SysTick_IRQn 1 */
-  systick_Inc();
+
   /* USER CODE END SysTick_IRQn 1 */
 }
 
@@ -244,6 +257,20 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles TIM1 update interrupt.
+  */
+void TIM1_UP_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM1_UP_IRQn 0 */
+
+  /* USER CODE END TIM1_UP_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim1);
+  /* USER CODE BEGIN TIM1_UP_IRQn 1 */
+
+  /* USER CODE END TIM1_UP_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM2 global interrupt.
   */
 void TIM2_IRQHandler(void)
@@ -263,61 +290,73 @@ void TIM2_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-	//this timer runs on 200Hz
-	if (timer_index % 2 == 0){
-		//code here runs on 100Hz
+	//this timer runs on 200Hz.
+	if (timer_index % 1 == 0){
+		//code here runs on 200Hz, the data is updating at 100Hz.
+		//Over-sampling ensures the data be updated at 100Hz.
 		  short gyro[3] = {0,0,0}, accel[3] = {0,0,0}, sensors;
 		  unsigned char more;
-		  unsigned long timestamp;
+		  unsigned long timestamp;//unused
 		  long quat[4];
 
-		  //TODO , while more != 0 read.
+		  do{
 		  int status = dmp_read_fifo(gyro, accel, quat, &timestamp, &sensors,&more);
 		  if (status == 0){
-			  XIMU_sens.q0 = quat[0];
-			  XIMU_sens.q1 = quat[1];
-			  XIMU_sens.q2 = quat[2];
-			  XIMU_sens.q3 = quat[3];
 
-			  XIMU_sens.ax = accel[0];
-			  XIMU_sens.ay = accel[1];
-			  XIMU_sens.az = accel[2];
+			  //quat is in q30 format, need to divide by 2^30.
+			  q[0] = ((double)quat[0]) / 1073741824.0;
+			  q[1] = ((double)quat[1]) / 1073741824.0;
+			  q[2] = ((double)quat[2]) / 1073741824.0;
+			  q[3] = ((double)quat[3]) / 1073741824.0;
 
-			  XIMU_sens.gx = gyro[0];
-			  XIMU_sens.gy = gyro[1];
-			  XIMU_sens.gz = gyro[2];
+			  //32768 = 2.0g
+			  a[0] = ((double)accel[0]) * 9.81 / 16384.0;
+			  a[1] = ((double)accel[1]) * 9.81 / 16384.0;
+			  a[2] = ((double)accel[2]) * 9.81 / 16384.0;
 
-			  XIMU_sens.qag_ts = millis();
-			  calc_absolute_acceleration();
-
-			  //TODO EKF_UPDATE
-			char str[400];
-			build_data_str(str);
-			CDC_Transmit_FS(str,strlen(str));
+			  w[0] = ((double)gyro[0]) * M_PI * 2000.0 / 180.0 / 32768.0; //32768 = 2000DEG/s
+			  w[1] = ((double)gyro[1]) * M_PI * 2000.0 / 180.0 / 32768.0;
+			  w[2] = ((double)gyro[2]) * M_PI * 2000.0 / 180.0 / 32768.0;
+			  send_imu_data = 1;
 		  }
-
+		  }while(more != 0 && initialize == 0);
+		  initialize = 1;
 	}
 
-	if (timer_index % 10 == 0){
-		//code here runs on 20Hz
-		ms5611_timer_update();
+	if (timer_index % 10 == 1){//avoid IMU update
+
+		if (ms5611_read_index == 0){
+			ms5611_retrieve_temperature();
+			pt[1] = ms5611_get_temperature();
+			ms5611_request_pressure();
+			ms5611_read_index++;
+		}else if (ms5611_read_index == TEMP_READ_INTERVAL - 1){
+			ms5611_retrieve_pressure();
+			pt[0] = ms5611_get_pressure();
+			ms5611_request_temperature();
+			ms5611_read_index = 0;
+		}else{
+			ms5611_retrieve_pressure();
+			pt[0] = ms5611_get_pressure();
+			ms5611_request_pressure();
+			ms5611_read_index++;
+		}
+		send_pt_data = 1;
 	}
 
-	if (timer_index % 20 == 0){
+	if (timer_index % 20 == 1){//avoid IMU update
 		//code here runs on 10Hz
 		short data[3];
 
 		int status = mpu_get_compass_reg(data,NULL);
 
 		if (status == 0){
-			XIMU_sens.mx = data[0];
-			XIMU_sens.my = data[1];
-			XIMU_sens.mz = data[2];
-			calibrate_mag_reading();
-
-			XIMU_sens.m_ts = millis();
-
-			//calc_magnetic_orientation();
+			double raw_mag[3];
+			raw_mag[0] = (double)data[0];
+			raw_mag[1] = (double)data[1];
+			raw_mag[2] = (double)data[2];
+			calibrate_and_convert_mag_reading(raw_mag,m);
+			send_mag_data = 1;
 		}
 
 		//poll DMA buffer
@@ -325,9 +364,10 @@ void TIM3_IRQHandler(void)
 
 		//Record GPS data
 		if (GNSS.GNGGA.status != 0){//data is valid
-			XIMU_sens.lat = GNSS.GNGGA.lat;
-			XIMU_sens.lon = GNSS.GNGGA.lon;
-			XIMU_sens.gps_ts = millis();
+			lla[0] = GNSS.GNGGA.lat;
+			lla[1] = GNSS.GNGGA.lon;
+			lla[2] = GNSS.GNGGA.MSL_alt;
+			send_gps_data = 1;
 		}
 	}
 

@@ -28,9 +28,7 @@ Core/components/src/ms5611.o: ../Core/components/src/ms5611.c \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_usb.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/i2c.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/systick.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/dataProcessing.h
+ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/i2c.h
 
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ms5611.h:
 
@@ -91,7 +89,3 @@ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ms5611.h:
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pcd_ex.h:
 
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/i2c.h:
-
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/systick.h:
-
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/dataProcessing.h:

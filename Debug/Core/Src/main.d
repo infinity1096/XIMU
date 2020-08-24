@@ -34,14 +34,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/i2c.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/DMPLib/inv_mpu_dmp_motion_driver.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ms5611.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/systick.h \
+ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/gnss.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/led.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/dataProcessing.h \
- ../Core/Inc/XIMU_conf.h ../Core/Inc/arm_math.h \
- ../Drivers/CMSIS/Include/cmsis_compiler.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/armMathUtils.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/quaternion.h \
- C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ESKF.h
+ ../Core/Inc/XIMU_conf.h \
+ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/ros_lib/rosserial_utils.h
 
 ../Core/Inc/main.h:
 
@@ -115,20 +111,10 @@ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/DMPLib/inv_mpu_dmp_motion_
 
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ms5611.h:
 
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/systick.h:
+C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/gnss.h:
 
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/led.h:
 
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/dataProcessing.h:
-
 ../Core/Inc/XIMU_conf.h:
 
-../Core/Inc/arm_math.h:
-
-../Drivers/CMSIS/Include/cmsis_compiler.h:
-
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/armMathUtils.h:
-
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/quaternion.h:
-
-C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ESKF.h:
+C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/ros_lib/rosserial_utils.h:
