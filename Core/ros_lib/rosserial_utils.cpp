@@ -84,6 +84,10 @@ extern "C" void GPS_pub(double lla[3]){
 	fix_msg.longitude = lla[1];
 	fix_msg.altitude = lla[2];
 
+	fix_msg.position_covariance[0] = 1.5;
+	fix_msg.position_covariance[4] = 1.5;
+	fix_msg.position_covariance[8] = 4.0;
+
 	gps_pub.publish(&fix_msg);
 
 }
