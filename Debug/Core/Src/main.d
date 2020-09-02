@@ -34,6 +34,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/i2c.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/DMPLib/inv_mpu_dmp_motion_driver.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ms5611.h \
+ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/HMC5883L.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/gnss.h \
  C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/led.h \
  ../Core/Inc/XIMU_conf.h \
@@ -110,6 +111,8 @@ C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/i2c.h:
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/DMPLib/inv_mpu_dmp_motion_driver.h:
 
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/ms5611.h:
+
+C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/HMC5883L.h:
 
 C:/Users/yuche/STM32CubeIDE/workspace_1.3.0/XIMU/Core/components/inc/gnss.h:
 

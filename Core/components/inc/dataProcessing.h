@@ -15,19 +15,19 @@
 //the following calibration is obtained using
 //https://www.instructables.com/id/Easy-hard-and-soft-iron-magnetometer-calibration/
 
-#define MAG_X_OFFSET 138.737
-#define MAG_Y_OFFSET 262.501
-#define MAG_Z_OFFSET -73.638
+#define MAG_X_OFFSET 0
+#define MAG_Y_OFFSET 0
+#define MAG_Z_OFFSET 0
 
-#define MAG_TRANSF_11 1.195
-#define MAG_TRANSF_12 -0.053
-#define MAG_TRANSF_13 0.054
-#define MAG_TRANSF_21 -0.044
-#define MAG_TRANSF_22 1.197
-#define MAG_TRANSF_23 0.01
-#define MAG_TRANSF_31 -0.026
-#define MAG_TRANSF_32 -0.013
-#define MAG_TRANSF_33 1.173
+#define MAG_TRANSF_11 1
+#define MAG_TRANSF_12 0
+#define MAG_TRANSF_13 0
+#define MAG_TRANSF_21 0
+#define MAG_TRANSF_22 1
+#define MAG_TRANSF_23 0
+#define MAG_TRANSF_31 0
+#define MAG_TRANSF_32 0
+#define MAG_TRANSF_33 1
 
 /**
  * magnatic field transformation matrix:

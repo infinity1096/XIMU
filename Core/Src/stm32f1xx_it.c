@@ -26,6 +26,7 @@
 #include "led.h"
 #include "ms5611.h"
 #include "mpu9250.h"
+#include "HMC5883L.h"
 #include "inv_mpu_dmp_motion_driver.h"
 #include "inv_mpu.h"
 
@@ -348,16 +349,16 @@ void TIM3_IRQHandler(void)
 		//code here runs on 10Hz
 		short data[3];
 
-		int status = mpu_get_compass_reg(data,NULL);
 
-		if (status == 0){
-			double raw_mag[3];
-			raw_mag[0] = (double)data[0];
-			raw_mag[1] = (double)data[1];
-			raw_mag[2] = (double)data[2];
-			calibrate_and_convert_mag_reading(raw_mag,m);
-			send_mag_data = 1;
-		}
+		HMC5883L_GetHeading(data);
+
+		double raw_mag[3];
+		raw_mag[0] = (double)data[0];
+		raw_mag[1] = (double)data[2];//for HMC5883L, data is in X Z Y format
+		raw_mag[2] = (double)data[1];//for HMC5883L, data is in X Z Y format
+		calibrate_and_convert_mag_reading(raw_mag,m);
+		send_mag_data = 1;
+
 
 		//poll DMA buffer
 		GNSS_RX_Update();

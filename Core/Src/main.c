@@ -32,6 +32,7 @@
 #include "inv_mpu_dmp_motion_driver.h"
 
 #include "ms5611.h"
+#include "HMC5883L.h"
 
 #include "gnss.h"
 
@@ -151,6 +152,15 @@ int main(void)
 
   GNSS_set_huart(&huart1);
   GNSS_Init();
+
+  HMC5883L_I2C_set(&hi2c1);
+  HMC5883L_Initialize();
+  HAL_Delay(10);
+
+
+  while (HMC5883L_TestConnection() == 0){
+	  HAL_Delay(10);
+  }
 
   int dmp_state = DMP_Init();
 

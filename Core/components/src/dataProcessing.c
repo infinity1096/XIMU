@@ -27,18 +27,18 @@ void calibrate_and_convert_mag_reading(double m_reading[3], double m[3]){
 	m_mag[2] = MAG_TRANSF_31*m_unbias[0] + MAG_TRANSF_32*m_unbias[1] + MAG_TRANSF_33*m_unbias[2];
 
 	/**
-	 * Conversion between AK8963 and MPU9250 axis:
+	 * Conversion between HMC5883L and MPU9250 axis:
 	 *
-	 * 		Axis in AK8963	|	Axis in MPU9250
+	 * 		Axis in HMC5883L	|	Axis in MPU9250
 	 *
-	 * 		+X	-------------------------	+Y
-	 * 		+Y	-------------------------	+X
+	 * 		+X	-------------------------	+X
+	 * 		+Y	-------------------------	-Y
 	 * 		+Z	-------------------------	-Z
 	 *
 	 */
 
-	m[0] = m_mag[1];
-	m[1] = m_mag[0];
+	m[0] = m_mag[0];
+	m[1] = -m_mag[1];
 	m[2] = -m_mag[2];
 }
 

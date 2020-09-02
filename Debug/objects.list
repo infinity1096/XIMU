@@ -8,6 +8,7 @@
 "Core/Src/sysmem.o"
 "Core/Src/system_stm32f1xx.o"
 "Core/Startup/startup_stm32f103c8tx.o"
+"Core/components/src/HMC5883L.o"
 "Core/components/src/dataProcessing.o"
 "Core/components/src/gnss.o"
 "Core/components/src/i2c.o"
