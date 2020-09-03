@@ -30,6 +30,7 @@
 //sensors
 #include "mpu9250.h"
 #include "inv_mpu_dmp_motion_driver.h"
+#include "inv_mpu.h"
 
 #include "ms5611.h"
 #include "HMC5883L.h"
@@ -167,6 +168,21 @@ int main(void)
   if (dmp_state){
 	  while (1) {
 		  //error
+	  }
+  }
+
+  long accel_bias[3] = {-333.0909/8.0, 69.6663/8.0, 102.8412/8.0}; // from +- 2g to +- 16g
+  long gyro_bias[3] = {-66.4549,   57.2769,  -16.6647};
+
+  if (mpu_set_accel_bias_6500_reg(accel_bias)){
+	while (1) {
+		//error
+	}
+  }
+
+  if(mpu_set_gyro_bias_reg(gyro_bias)){
+	  while (1) {
+		//error
 	  }
   }
 

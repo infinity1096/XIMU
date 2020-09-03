@@ -310,14 +310,16 @@ void TIM3_IRQHandler(void)
 			  q[2] = ((double)quat[2]) / 1073741824.0;
 			  q[3] = ((double)quat[3]) / 1073741824.0;
 
+
 			  //32768 = 2.0g
-			  a[0] = ((double)accel[0]) * 9.81 / 16384.0;
-			  a[1] = ((double)accel[1]) * 9.81 / 16384.0;
-			  a[2] = ((double)accel[2]) * 9.81 / 16384.0;
+			  a[0] = ((double)accel[0]) * 9.80655 / 16384.0;
+			  a[1] = ((double)accel[1]) * 9.80655 / 16384.0;
+			  a[2] = ((double)accel[2]) * 9.80655 / 16384.0;
 
 			  w[0] = ((double)gyro[0]) * M_PI * 2000.0 / 180.0 / 32768.0; //32768 = 2000DEG/s
 			  w[1] = ((double)gyro[1]) * M_PI * 2000.0 / 180.0 / 32768.0;
 			  w[2] = ((double)gyro[2]) * M_PI * 2000.0 / 180.0 / 32768.0;
+
 			  send_imu_data = 1;
 		  }
 		  }while(more != 0 && initialize == 0);
@@ -358,7 +360,6 @@ void TIM3_IRQHandler(void)
 		raw_mag[2] = (double)data[1];//for HMC5883L, data is in X Z Y format
 		calibrate_and_convert_mag_reading(raw_mag,m);
 		send_mag_data = 1;
-
 
 		//poll DMA buffer
 		GNSS_RX_Update();

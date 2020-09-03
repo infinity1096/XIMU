@@ -18,9 +18,9 @@ void calibrate_and_convert_mag_reading(double m_reading[3], double m[3]){
 	double m_unbias[3]; //magnatic readings minus offset
 	double m_mag[3];
 
-	m_unbias[0] = m_reading[0] - MAG_X_OFFSET;
-	m_unbias[1] = m_reading[1] - MAG_Y_OFFSET;
-	m_unbias[2] = m_reading[2] - MAG_Z_OFFSET;
+	m_unbias[0] = m_reading[0] + MAG_X_OFFSET;
+	m_unbias[1] = m_reading[1] + MAG_Y_OFFSET;
+	m_unbias[2] = m_reading[2] + MAG_Z_OFFSET;
 
 	m_mag[0] = MAG_TRANSF_11*m_unbias[0] + MAG_TRANSF_12*m_unbias[1] + MAG_TRANSF_13*m_unbias[2];
 	m_mag[1] = MAG_TRANSF_21*m_unbias[0] + MAG_TRANSF_22*m_unbias[1] + MAG_TRANSF_23*m_unbias[2];
