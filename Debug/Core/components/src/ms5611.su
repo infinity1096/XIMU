@@ -11,4 +11,4 @@ ms5611.c:136:6:ms5611_update_temperature	8	static
 ms5611.c:147:6:ms5611_update	8	static
 ms5611.c:64:6:ms5611_init	24	static
 ms5611.c:156:8:ms5611_get_temperature	24	static
-ms5611.c:174:8:ms5611_get_pressure	56	static
+ms5611.c:174:8:ms5611_get_pressure	48	static

@@ -15,7 +15,7 @@
 
 
 uint16_t fc[NUM_CALIBRATION_DATA]; // 6 factory calibration data
-uint32_t raw_pressure, raw_temperature;
+int32_t raw_pressure, raw_temperature;
 enum MS5611_OSR selected_osr = MS5611_OSR_4096;
 
 
@@ -154,7 +154,7 @@ void ms5611_update(){
  * @return calibrated temperature
  */
 double ms5611_get_temperature(){
-	uint32_t dT = raw_temperature - ((uint32_t)fc[4] * 256);
+	uint32_t dT = raw_temperature - ((uint32_t)fc[4] * 256.0);
 	double TEMP = 2000.0 + dT * (fc[5] / (8388608.0));//unit 0.01 C
 
 	double T2=0;
@@ -173,32 +173,34 @@ double ms5611_get_temperature(){
  */
 double ms5611_get_pressure(){
 
-	uint32_t dT = raw_temperature - ((uint32_t)fc[4] * 256);
-	double TEMP = 2000.0 + dT * (fc[5] / (8388608.0));//unit 0.01 C
+	int32_t dT = raw_temperature - (uint32_t)fc[4] * 256;
 
-	double OFF = fc[1] * (65536.0) + fc[3] * dT / (128);
-	double SENS = fc[0] * (32768.0) + fc[2] * dT / (256);
+	int64_t OFF = (int64_t)fc[1] * 65536 + (int64_t)fc[3] * dT / 128;
+	int64_t SENS = (int64_t)fc[0] * 32768 + (int64_t)fc[2] * dT / 256;
 
-	double P = (raw_pressure * SENS / (2097152.0) - OFF) / (32768.0);//unit 0.01mbar
 
-	double T2=0, OFF2=0, SENS2=0;
-	if (TEMP < 2000){
-		//temperature < 20 Celsius
-		T2 = dT * dT / (2147483648.0);
-		OFF2 = 5 * (TEMP-2000) * (TEMP-2000) / 2;
-		SENS2 = 5 * (TEMP-2000) * (TEMP-2000) / 4;
+	int32_t TEMP = 2000 + ((int64_t) dT * fc[5]) / 8388608;
 
-		if (TEMP < -1500){
-			//temperature < -15 Celsius
-			OFF2 = OFF2 + 7 * (TEMP + 1500) * (TEMP + 1500);
-			SENS2 = SENS2 + 11/2 * (TEMP + 1500) * (TEMP + 1500);
-		}
+	double OFF2 = 0;
+	double SENS2 = 0;
+
+	if (TEMP < 2000)
+	{
+		OFF2 = 5 * ((TEMP - 2000) * (TEMP - 2000)) / 2;
+		SENS2 = 5 * ((TEMP - 2000) * (TEMP - 2000)) / 4;
 	}
 
-	TEMP = TEMP - T2;
+	if (TEMP < -1500)
+	{
+		OFF2 = OFF2 + 7 * ((TEMP + 1500) * (TEMP + 1500));
+		SENS2 = SENS2 + 11 * ((TEMP + 1500) * (TEMP + 1500)) / 2;
+	}
+
 	OFF = OFF - OFF2;
 	SENS = SENS - SENS2;
 
-	P = (raw_pressure * SENS / (2097152.0) - OFF) / (32768.0);//unit mbar
-	return P / 100;//unit mbar
+
+	uint32_t P = (raw_pressure * SENS / 2097152 - OFF) / 32768;
+
+	return (double)P / 100.0;
 }
