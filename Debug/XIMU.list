@@ -4334,16 +4334,16 @@ static void MX_GPIO_Init(void)
  80020b0:	4621      	mov	r1, r4
  80020b2:	4630      	mov	r0, r6
  80020b4:	f007 fde6 	bl	8009c84 <memset>
-  htim2.Init.Period = 1250;
- 80020b8:	f240 42e2 	movw	r2, #1250	; 0x4e2
-  htim2.Init.Prescaler = 7200;
- 80020bc:	f44f 53e1 	mov.w	r3, #7200	; 0x1c20
+  htim2.Init.Period = 1250-1;
+ 80020b8:	f240 42e1 	movw	r2, #1249	; 0x4e1
+  htim2.Init.Prescaler = 7200-1;
+ 80020bc:	f641 431f 	movw	r3, #7199	; 0x1c1f
  80020c0:	f04f 4180 	mov.w	r1, #1073741824	; 0x40000000
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
  80020c4:	4640      	mov	r0, r8
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
  80020c6:	e9c8 2403 	strd	r2, r4, [r8, #12]
-  htim2.Init.Prescaler = 7200;
+  htim2.Init.Prescaler = 7200-1;
  80020ca:	e9c8 1300 	strd	r1, r3, [r8]
  80020ce:	9301      	str	r3, [sp, #4]
   TIM_MasterConfigTypeDef sMasterConfig = {0};
@@ -4376,14 +4376,14 @@ static void MX_GPIO_Init(void)
  80020fe:	4621      	mov	r1, r4
  8002100:	4630      	mov	r0, r6
  8002102:	f007 fdbf 	bl	8009c84 <memset>
-  htim3.Init.Prescaler = 7200;
+  htim3.Init.Prescaler = 7200-1;
  8002106:	9b01      	ldr	r3, [sp, #4]
   htim3.Instance = TIM3;
  8002108:	4963      	ldr	r1, [pc, #396]	; (8002298 <main+0x2d0>)
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
  800210a:	e9c7 3401 	strd	r3, r4, [r7, #4]
-  htim3.Init.Period = 50;
- 800210e:	2332      	movs	r3, #50	; 0x32
+  htim3.Init.Period = 50-1;
+ 800210e:	2331      	movs	r3, #49	; 0x31
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
  8002110:	4638      	mov	r0, r7
   htim3.Instance = TIM3;
