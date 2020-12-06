@@ -1,0 +1,88 @@
+Removed Pin From Net: NetName=SDA Pin=U1-92
+Removed Pin From Net: NetName=SCL Pin=U1-93
+Change Component Designator: OldDesignator= NewDesignator=*1
+Change Component Designator: OldDesignator= NewDesignator=C1
+Change Component Designator: OldDesignator= NewDesignator=C2
+Change Component Designator: OldDesignator= NewDesignator=C3
+Change Component Designator: OldDesignator= NewDesignator=C4
+Change Component Designator: OldDesignator= NewDesignator=C5
+Change Component Designator: OldDesignator= NewDesignator=C6
+Change Component Designator: OldDesignator= NewDesignator=C7
+Change Component Designator: OldDesignator= NewDesignator=C8
+Change Component Designator: OldDesignator= NewDesignator=C9
+Change Component Designator: OldDesignator= NewDesignator=C10
+Change Component Designator: OldDesignator= NewDesignator=C11
+Change Component Designator: OldDesignator= NewDesignator=C12
+Change Component Designator: OldDesignator= NewDesignator=C13
+Change Component Designator: OldDesignator= NewDesignator=C14
+Change Component Designator: OldDesignator= NewDesignator=C15
+Change Component Designator: OldDesignator= NewDesignator=C16
+Change Component Designator: OldDesignator= NewDesignator=C17
+Change Component Designator: OldDesignator= NewDesignator=C18
+Change Component Designator: OldDesignator= NewDesignator=C19
+Change Component Designator: OldDesignator= NewDesignator=C20
+Change Component Designator: OldDesignator= NewDesignator=D1
+Change Component Designator: OldDesignator= NewDesignator=D2
+Change Component Designator: OldDesignator= NewDesignator=D3
+Change Component Designator: OldDesignator= NewDesignator=P1
+Change Component Designator: OldDesignator= NewDesignator=P2
+Change Component Designator: OldDesignator= NewDesignator=P3
+Change Component Designator: OldDesignator= NewDesignator=R1
+Change Component Designator: OldDesignator= NewDesignator=R2
+Change Component Designator: OldDesignator= NewDesignator=R3
+Change Component Designator: OldDesignator= NewDesignator=R4
+Change Component Designator: OldDesignator= NewDesignator=R5
+Change Component Designator: OldDesignator= NewDesignator=R6
+Change Component Designator: OldDesignator= NewDesignator=R7
+Change Component Designator: OldDesignator= NewDesignator=R8
+Change Component Designator: OldDesignator= NewDesignator=R9
+Change Component Designator: OldDesignator= NewDesignator=SW1
+Change Component Designator: OldDesignator= NewDesignator=U2
+Change Component Designator: OldDesignator= NewDesignator=U3
+Change Component Designator: OldDesignator= NewDesignator=U4
+Change Component Designator: OldDesignator= NewDesignator=Y1
+Added Pin To Net: NetName=SCL Pin=U1-92
+Added Pin To Net: NetName=SDA Pin=U1-93
+Added Member To Class: ClassName=XIMUF407 Member=Component *1 USB TYPEC 16P
+Added Member To Class: ClassName=XIMUF407 Member=Component C1 105
+Added Member To Class: ClassName=XIMUF407 Member=Component C2 105
+Added Member To Class: ClassName=XIMUF407 Member=Component C3 105
+Added Member To Class: ClassName=XIMUF407 Member=Component C4 22pF
+Added Member To Class: ClassName=XIMUF407 Member=Component C5 22pF
+Added Member To Class: ClassName=XIMUF407 Member=Component C6 104
+Added Member To Class: ClassName=XIMUF407 Member=Component C7 104
+Added Member To Class: ClassName=XIMUF407 Member=Component C8 104
+Added Member To Class: ClassName=XIMUF407 Member=Component C9 104
+Added Member To Class: ClassName=XIMUF407 Member=Component C10 104
+Added Member To Class: ClassName=XIMUF407 Member=Component C11 104
+Added Member To Class: ClassName=XIMUF407 Member=Component C12 104
+Added Member To Class: ClassName=XIMUF407 Member=Component C13 104
+Added Member To Class: ClassName=XIMUF407 Member=Component C14 2.2uF
+Added Member To Class: ClassName=XIMUF407 Member=Component C15 2.2uF
+Added Member To Class: ClassName=XIMUF407 Member=Component C16 105
+Added Member To Class: ClassName=sensors Member=Component C17 104
+Added Member To Class: ClassName=sensors Member=Component C18 103
+Added Member To Class: ClassName=sensors Member=Component C19 104
+Added Member To Class: ClassName=sensors Member=Component C20 104
+Added Member To Class: ClassName=XIMUF407 Member=Component D1 PWR
+Added Member To Class: ClassName=XIMUF407 Member=Component D2 STAT
+Added Member To Class: ClassName=XIMUF407 Member=Component D3 DATA
+Added Member To Class: ClassName=XIMUF407 Member=Component P1 Header 3
+Added Member To Class: ClassName=XIMUF407 Member=Component P2 Header 4
+Added Member To Class: ClassName=sensors Member=Component P3 Header 6
+Added Member To Class: ClassName=XIMUF407 Member=Component R1 Res3
+Added Member To Class: ClassName=XIMUF407 Member=Component R2 Res3
+Added Member To Class: ClassName=XIMUF407 Member=Component R3 Res3
+Added Member To Class: ClassName=XIMUF407 Member=Component R4 Res3
+Added Member To Class: ClassName=XIMUF407 Member=Component R5 Res3
+Added Member To Class: ClassName=XIMUF407 Member=Component R6 Res3
+Added Member To Class: ClassName=XIMUF407 Member=Component R7 Res3
+Added Member To Class: ClassName=sensors Member=Component R8 Res3
+Added Member To Class: ClassName=sensors Member=Component R9 Res3
+Added Member To Class: ClassName=XIMUF407 Member=Component SW1 SW-PB_V
+Added Member To Class: ClassName=XIMUF407 Member=Component U2 RT9193
+Added Member To Class: ClassName=sensors Member=Component U3 MPU-9250
+Added Member To Class: ClassName=sensors Member=Component U4 MS561101BA03-50
+Added Member To Class: ClassName=XIMUF407 Member=Component Y1 25MHz
+Added Room: Name=sensors
+Added Room: Name=XIMUF407
