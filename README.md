@@ -13,6 +13,8 @@ This module interface with the ROS network through USB with rosserial.
 # Output description
 ![XIMU information flow](https://github.com/infinity1096/XIMU/blob/ROS-Filtering/images/XIMU_information_flow.png)
 
+The port may differ on different computers. Since the XIMU send data via VCP(Virtual COM Port), the baud rate can be arbitrary.
+
 # Frame definition
 Color corrospondence: Red - X, Green - Y, Blue - Z
 ![IMU frame](https://github.com/infinity1096/XIMU/blob/ROS-Filtering/images/IMU%20frame.jpg)
@@ -41,3 +43,9 @@ State | LED
 ------------ | ------------
 synchronized with ROS network | ON(solid)
 not synchronized with ROS network | OFF
+
+# Usage
+To receive information from XIMU, we need the rosserial node. install rosserial package and run the node:
+```
+rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0 _baud:=250000
+```
